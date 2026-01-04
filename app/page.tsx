@@ -5,60 +5,59 @@ export default function Home() {
     <main className="min-h-screen bg-ios-bg">
       <div className="max-w-md mx-auto px-4 py-8">
         {/* Header */}
-        <header className="flex justify-between items-center mb-12">
-          <h1 className="text-2xl font-semibold text-ios-label">PricePing</h1>
+        <header className="flex justify-between items-center mb-16">
+          <h1 className="text-[22px] font-semibold text-ios-label">PricePing</h1>
           <Link 
             href="/login" 
-            className="text-ios-tint text-[15px] font-medium"
+            className="text-ios-tint text-[15px]"
           >
             Sign In
           </Link>
         </header>
 
         {/* Hero Section */}
-        <div className="text-center mb-12">
-          <h2 className="text-[28px] font-semibold text-ios-label mb-4 leading-tight">
+        <div className="text-center mb-16">
+          <h2 className="text-[28px] font-semibold text-ios-label mb-3 leading-tight">
             Monitor Price Changes
           </h2>
-          <p className="text-[15px] text-ios-secondary mb-8 leading-relaxed">
-            Get instant email alerts when prices drop or content changes on any website.
+          <p className="text-[15px] text-ios-secondary mb-10 leading-relaxed">
+            Get email alerts when prices drop or content changes.
           </p>
           <Link 
             href="/login" 
-            className="inline-block w-full max-w-xs bg-ios-tint text-white px-8 h-12 rounded-lg text-[15px] font-semibold active:scale-[0.98] transition-transform flex items-center justify-center"
+            className="inline-block w-full max-w-xs bg-black text-white px-8 h-11 rounded-[22px] text-[15px] font-semibold active:opacity-80 transition-opacity flex items-center justify-center"
           >
             Get Started
           </Link>
         </div>
 
         {/* Features */}
-        <div className="space-y-4 mb-12">
-          <div className="bg-ios-card p-6 rounded-ioslg shadow-ios">
-            <div className="text-3xl mb-3">🎯</div>
-            <h3 className="text-[18px] font-semibold mb-2 text-ios-label">Precise Monitoring</h3>
-            <p className="text-[14px] text-ios-secondary leading-relaxed">
-              Monitor specific elements using CSS selectors for accurate tracking.
+        <div className="bg-ios-card rounded-ioslg shadow-ios overflow-hidden mb-16">
+          <div className="px-4 py-4">
+            <h3 className="text-[15px] font-semibold text-ios-label">Precise Monitoring</h3>
+            <p className="text-[13px] text-ios-secondary mt-1 leading-relaxed">
+              Monitor specific elements using CSS selectors.
             </p>
           </div>
-          <div className="bg-ios-card p-6 rounded-ioslg shadow-ios">
-            <div className="text-3xl mb-3">⚡</div>
-            <h3 className="text-[18px] font-semibold mb-2 text-ios-label">Instant Alerts</h3>
-            <p className="text-[14px] text-ios-secondary leading-relaxed">
-              Email notifications when changes are detected. Choose hourly to daily intervals.
+          <div className="h-px bg-ios-separator" />
+          <div className="px-4 py-4">
+            <h3 className="text-[15px] font-semibold text-ios-label">Instant Alerts</h3>
+            <p className="text-[13px] text-ios-secondary mt-1 leading-relaxed">
+              Email notifications when changes are detected.
             </p>
           </div>
-          <div className="bg-ios-card p-6 rounded-ioslg shadow-ios">
-            <div className="text-3xl mb-3">💰</div>
-            <h3 className="text-[18px] font-semibold mb-2 text-ios-label">Affordable Pricing</h3>
-            <p className="text-[14px] text-ios-secondary leading-relaxed">
-              Start free with 1 monitor. Upgrade to Pro to monitor up to 20 pages.
+          <div className="h-px bg-ios-separator" />
+          <div className="px-4 py-4">
+            <h3 className="text-[15px] font-semibold text-ios-label">Affordable</h3>
+            <p className="text-[13px] text-ios-secondary mt-1 leading-relaxed">
+              Start free. Upgrade to Pro for up to 20 monitors.
             </p>
           </div>
         </div>
 
         {/* Footer */}
-        <footer className="mt-16 text-center space-y-2">
-          <div className="flex justify-center gap-4 text-xs text-ios-secondary">
+        <footer className="text-center">
+          <div className="flex justify-center gap-6 text-[13px] text-ios-secondary">
             <Link href="/terms" className="hover:text-ios-label">
               Terms
             </Link>

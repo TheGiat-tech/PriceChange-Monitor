@@ -40,64 +40,57 @@ export default async function DashboardPage() {
   return (
     <IOSContainer>
       {/* Header */}
-      <div className="mb-6">
+      <div className="mb-8">
         <div className="flex justify-between items-center mb-1">
           <h1 className="text-[28px] font-semibold text-ios-label">PricePing</h1>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             <Link
               href="/pricing"
-              className="text-ios-tint text-sm font-medium"
+              className="text-ios-tint text-[15px]"
             >
               {profile?.plan === 'pro' ? 'Pro' : 'Upgrade'}
             </Link>
-            <div className="w-9 h-9 rounded-full bg-ios-tint text-white flex items-center justify-center text-sm font-semibold">
+            <div className="w-8 h-8 rounded-full bg-ios-separator/40 text-ios-label flex items-center justify-center text-[13px] font-medium">
               {userInitials}
             </div>
           </div>
         </div>
-        <div className="h-px bg-ios-separator" />
       </div>
 
-      {/* Welcome Card */}
-      <IOSCard className="mb-4">
-        <div className="p-6">
-          <h2 className="text-[18px] font-semibold text-ios-label mb-2">
-            Welcome back{user.email ? `, ${user.email.split('@')[0]}` : ''}
-          </h2>
-          <p className="text-[14px] text-ios-secondary mb-4">
-            You have {activeMonitorsCount} active monitor{activeMonitorsCount !== 1 ? 's' : ''}
-          </p>
-          <Link href="/monitors/new">
-            <TintButton disabled={activeMonitorsCount >= maxMonitors}>
-              + Add Monitor
-            </TintButton>
-          </Link>
-          {activeMonitorsCount >= maxMonitors && (
-            <p className="text-xs text-ios-secondary mt-2 text-center">
-              You&apos;ve reached your limit. {profile?.plan === 'free' && (
-                <Link href="/pricing" className="text-ios-tint">Upgrade to Pro</Link>
-              )}
-            </p>
-          )}
-        </div>
-      </IOSCard>
-
-      {/* Active Monitors */}
+      {/* Main Content Card */}
       {!monitors || monitors.length === 0 ? (
-        <IOSCard className="mb-4">
-          <div className="p-8 text-center">
-            <div className="text-5xl mb-4">📊</div>
-            <h3 className="text-[18px] font-semibold text-ios-label mb-2">No monitors yet</h3>
-            <p className="text-[14px] text-ios-secondary mb-6">
-              Create your first monitor to start tracking changes
-            </p>
-          </div>
-        </IOSCard>
+        <>
+          <IOSCard className="mb-6">
+            <div className="px-4 py-12 text-center">
+              <p className="text-[17px] text-ios-label mb-6">No monitors yet</p>
+              <Link href="/monitors/new">
+                <button className="text-ios-tint text-[17px]">
+                  Add monitor
+                </button>
+              </Link>
+            </div>
+          </IOSCard>
+        </>
       ) : (
-        <IOSCard title="ACTIVE MONITORS" className="mb-4">
+        <IOSCard className="mb-6">
+          {/* Summary */}
+          <div className="px-4 py-4">
+            <div className="flex items-center justify-between">
+              <span className="text-[15px] text-ios-label">{activeMonitorsCount} active</span>
+              {activeMonitorsCount < maxMonitors && (
+                <Link href="/monitors/new" className="text-ios-tint text-[15px]">
+                  Add monitor
+                </Link>
+              )}
+            </div>
+          </div>
+          
+          <div className="h-px bg-ios-separator" />
+          
+          {/* Monitors List */}
           {monitors.map((monitor, index) => (
             <div key={monitor.id}>
-              {index > 0 && <div className="h-px bg-ios-separator mx-4" />}
+              {index > 0 && <div className="h-px bg-ios-separator" />}
               <IOSRow
                 label={monitor.label || monitor.url}
                 secondary={`Checked ${monitor.last_checked_at ? new Date(monitor.last_checked_at).toLocaleDateString() : 'never'}`}
@@ -111,28 +104,24 @@ export default async function DashboardPage() {
               />
             </div>
           ))}
-        </IOSCard>
-      )}
-
-      {/* Try Example Monitor Card */}
-      {(!monitors || monitors.length === 0) && (
-        <IOSCard className="mb-4">
-          <div className="p-6">
-            <h3 className="text-[18px] font-semibold text-ios-label mb-2">
-              Try an Example Monitor
-            </h3>
-            <p className="text-[14px] text-ios-secondary mb-4">
-              Monitor example.com and set alerts for price changes
-            </p>
-            <Link href="/monitors/new">
-              <PrimaryButton>Create from Example</PrimaryButton>
-            </Link>
-          </div>
+          
+          {activeMonitorsCount >= maxMonitors && (
+            <>
+              <div className="h-px bg-ios-separator" />
+              <div className="px-4 py-3">
+                <p className="text-[13px] text-ios-secondary text-center">
+                  Monitor limit reached. {profile?.plan === 'free' && (
+                    <Link href="/pricing" className="text-ios-tint">Upgrade</Link>
+                  )}
+                </p>
+              </div>
+            </>
+          )}
         </IOSCard>
       )}
 
       {/* Sign Out */}
-      <IOSCard className="mb-4">
+      <IOSCard className="mb-6">
         <form action={handleSignOut}>
           <button type="submit" className="w-full">
             <IOSRow label="Sign Out" className="text-red-600" />
@@ -141,16 +130,13 @@ export default async function DashboardPage() {
       </IOSCard>
 
       {/* Footer */}
-      <div className="mt-8 mb-4 text-center space-y-2">
-        <div className="flex justify-center gap-4 text-xs text-ios-secondary">
+      <div className="mt-12 mb-6 text-center">
+        <div className="flex justify-center gap-6 text-[13px] text-ios-secondary">
           <Link href="/privacy" className="hover:text-ios-label">
             Privacy
           </Link>
           <Link href="/terms" className="hover:text-ios-label">
             Terms
-          </Link>
-          <Link href="/pricing" className="hover:text-ios-label">
-            Pricing
           </Link>
         </div>
       </div>

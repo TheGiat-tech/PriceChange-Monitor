@@ -10,8 +10,8 @@ export default function IOSCard({ children, title, className = '' }: IOSCardProp
   return (
     <div className={`bg-ios-card rounded-ioslg shadow-ios overflow-hidden ${className}`}>
       {title && (
-        <div className="px-4 pt-3 pb-2">
-          <h3 className="text-xs uppercase tracking-wide text-ios-secondary font-medium">
+        <div className="px-4 pt-2 pb-1">
+          <h3 className="text-[11px] uppercase tracking-wider text-ios-secondary font-medium">
             {title}
           </h3>
         </div>

@@ -31,74 +31,58 @@ export default function PricingPage() {
 
   return (
     <IOSContainer>
-      <div className="mb-4">
-        <Link href="/dashboard" className="text-ios-tint text-sm font-medium">
+      <div className="mb-6">
+        <Link href="/dashboard" className="text-ios-tint text-[15px]">
           ← Back
         </Link>
         <h1 className="text-[28px] font-semibold text-ios-label mt-2">Pricing</h1>
-        <p className="text-[14px] text-ios-secondary mt-1">Choose the plan that works for you</p>
       </div>
 
-      {/* Free Plan */}
-      <IOSCard title="FREE" className="mb-4">
-        <div className="p-6">
-          <div className="mb-4">
+      {/* Plans Card */}
+      <IOSCard className="mb-6">
+        <div className="px-4 py-5">
+          <div className="flex items-baseline gap-1 mb-1">
             <span className="text-[32px] font-semibold text-ios-label">$0</span>
-            <span className="text-ios-secondary">/month</span>
+            <span className="text-[15px] text-ios-secondary">/month</span>
           </div>
-          <div className="space-y-2 mb-4">
-            <IOSRow label="1 active monitor" />
-            <IOSRow label="Email alerts" />
-            <IOSRow label="Daily checks" />
-            <IOSRow label="Change history" />
-          </div>
+          <p className="text-[13px] text-ios-secondary mb-3">1 monitor, daily checks</p>
           <Link href="/login">
-            <TintButton>Get Started</TintButton>
+            <button className="text-ios-tint text-[17px] font-medium focus:outline-none focus:underline">Get Started</button>
           </Link>
         </div>
-      </IOSCard>
-
-      {/* Pro Plan */}
-      <IOSCard title="PRO" className="mb-4">
-        <div className="p-6">
-          <div className="mb-4">
+        
+        <div className="h-px bg-ios-separator" />
+        
+        <div className="px-4 py-5">
+          <div className="flex items-baseline gap-1 mb-1">
             <span className="text-[32px] font-semibold text-ios-label">$9</span>
-            <span className="text-ios-secondary">/month</span>
+            <span className="text-[15px] text-ios-secondary">/month</span>
           </div>
-          <div className="space-y-2 mb-4">
-            <IOSRow label="Up to 20 monitors" className="font-semibold" />
-            <IOSRow label="Email alerts" />
-            <IOSRow label="Hourly checks" className="font-semibold" />
-            <IOSRow label="Change history" />
-            <IOSRow label="Priority support" />
-          </div>
-          <TintButton onClick={handleUpgrade} disabled={loading}>
+          <p className="text-[13px] text-ios-secondary mb-3">20 monitors, hourly checks</p>
+          <button 
+            onClick={handleUpgrade} 
+            disabled={loading}
+            className="text-ios-tint text-[17px] font-medium disabled:opacity-40 focus:outline-none focus:underline"
+          >
             {loading ? 'Processing...' : 'Upgrade to Pro'}
-          </TintButton>
+          </button>
         </div>
       </IOSCard>
 
       {/* FAQ */}
-      <IOSCard title="FAQ" className="mb-4">
-        <div className="p-6 space-y-4">
-          <div>
-            <h4 className="font-semibold text-ios-label text-[15px] mb-1">How does monitoring work?</h4>
-            <p className="text-[14px] text-ios-secondary">
-              We check your pages at your chosen interval and alert you via email when changes are detected.
-            </p>
-          </div>
-          <div>
-            <h4 className="font-semibold text-ios-label text-[15px] mb-1">Can I cancel anytime?</h4>
-            <p className="text-[14px] text-ios-secondary">
-              Yes! Cancel anytime. Your monitors continue until the end of your billing period.
-            </p>
-          </div>
-          <div>
-            <h4 className="font-semibold text-ios-label text-[15px] mb-1">What can I monitor?</h4>
-            <p className="text-[14px] text-ios-secondary">
-              Any text content - prices, stock status, availability, articles, and more.
-            </p>
-          </div>
+      <IOSCard className="mb-6">
+        <div className="px-4 py-4">
+          <h4 className="font-semibold text-ios-label text-[15px] mb-1">Can I cancel anytime?</h4>
+          <p className="text-[13px] text-ios-secondary leading-relaxed">
+            Yes. Monitors continue until billing period ends.
+          </p>
+        </div>
+        <div className="h-px bg-ios-separator" />
+        <div className="px-4 py-4">
+          <h4 className="font-semibold text-ios-label text-[15px] mb-1">What can I monitor?</h4>
+          <p className="text-[13px] text-ios-secondary leading-relaxed">
+            Any text content—prices, stock, availability.
+          </p>
         </div>
       </IOSCard>
     </IOSContainer>
