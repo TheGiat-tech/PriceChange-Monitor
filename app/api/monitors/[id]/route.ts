@@ -58,7 +58,7 @@ export async function PATCH(
         },
         {
           onConflict: 'id',
-          ignoreDuplicates: false,
+          ignoreDuplicates: true,
         }
       )
       .select('plan')

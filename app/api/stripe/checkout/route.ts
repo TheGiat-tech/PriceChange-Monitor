@@ -24,7 +24,7 @@ export async function POST() {
       },
       {
         onConflict: 'id',
-        ignoreDuplicates: false,
+        ignoreDuplicates: true,
       }
     )
     .select('stripe_customer_id, email')

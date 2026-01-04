@@ -47,7 +47,7 @@ export async function POST(request: Request) {
       },
       {
         onConflict: 'id',
-        ignoreDuplicates: false,
+        ignoreDuplicates: true,
       }
     )
     .select('plan')
