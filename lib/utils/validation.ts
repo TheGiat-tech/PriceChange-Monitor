@@ -10,6 +10,7 @@ export const monitorSchema = z.object({
   }),
   notification_email: z.string().email(),
   is_active: z.boolean().default(true),
+  cooldown_minutes: z.number().int().min(1).optional().default(60),
 })
 
 export const testSelectorSchema = z.object({

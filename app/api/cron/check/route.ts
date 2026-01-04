@@ -101,6 +101,17 @@ async function processMonitor(monitor: any, supabase: any) {
     if (hasChanged) {
       console.log(`Change detected for monitor ${monitorId}`)
 
+      // Check alert cooldown
+      const now = new Date()
+      const cooldownMinutes = monitor.cooldown_minutes || 60
+      let shouldSendAlert = true
+
+      if (monitor.last_alert_sent_at) {
+        const lastAlertTime = new Date(monitor.last_alert_sent_at)
+        const minutesSinceLastAlert = (now.getTime() - lastAlertTime.getTime()) / 1000 / 60
+        shouldSendAlert = minutesSinceLastAlert >= cooldownMinutes
+      }
+
       // Create event
       await supabase.from('events').insert({
         monitor_id: monitorId,
@@ -112,15 +123,29 @@ async function processMonitor(monitor: any, supabase: any) {
         changed_at: new Date().toISOString(),
       })
 
-      // Send email notification
-      await sendChangeAlert({
-        to: monitor.notification_email,
-        url: monitor.url,
-        label: monitor.label,
-        oldValue: monitor.last_value,
-        newValue: normalized,
-        timestamp: new Date(),
-      })
+      // Send email notification if not in cooldown
+      if (shouldSendAlert) {
+        await sendChangeAlert({
+          to: monitor.notification_email,
+          url: monitor.url,
+          label: monitor.label,
+          oldValue: monitor.last_value,
+          newValue: normalized,
+          timestamp: new Date(),
+        })
+
+        console.log(`Alert sent for monitor ${monitorId}`)
+
+        // Update last_alert_sent_at
+        await supabase
+          .from('monitors')
+          .update({
+            last_alert_sent_at: now.toISOString(),
+          })
+          .eq('id', monitorId)
+      } else {
+        console.log(`Alert skipped for monitor ${monitorId} - cooldown active`)
+      }
     }
 
     // Update monitor

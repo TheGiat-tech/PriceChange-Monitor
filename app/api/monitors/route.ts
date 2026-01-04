@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { monitorSchema } from '@/lib/utils/validation'
+import { canCreateMonitor, canUseInterval, getPlanViolationMessage, type Plan } from '@/lib/plan'
 import { NextResponse } from 'next/server'
 
 export const runtime = 'nodejs'
@@ -42,6 +43,8 @@ export async function POST(request: Request) {
     .eq('id', user.id)
     .single()
 
+  const plan = (profile?.plan || 'free') as Plan
+
   // Count active monitors
   const { count } = await supabase
     .from('monitors')
@@ -49,11 +52,9 @@ export async function POST(request: Request) {
     .eq('user_id', user.id)
     .eq('is_active', true)
 
-  const maxMonitors = profile?.plan === 'pro' ? 20 : 1
-
-  if ((count || 0) >= maxMonitors) {
+  if (!canCreateMonitor(plan, count || 0)) {
     return NextResponse.json(
-      { error: `You have reached your monitor limit (${maxMonitors}). Upgrade to add more.` },
+      { error: getPlanViolationMessage(plan, 'monitor_limit') },
       { status: 403 }
     )
   }
@@ -61,6 +62,14 @@ export async function POST(request: Request) {
   try {
     const body = await request.json()
     const validated = monitorSchema.parse(body)
+
+    // Enforce interval limits based on plan
+    if (!canUseInterval(plan, validated.interval_minutes)) {
+      return NextResponse.json(
+        { error: getPlanViolationMessage(plan, 'interval_limit') },
+        { status: 403 }
+      )
+    }
 
     const { data: monitor, error } = await supabase
       .from('monitors')

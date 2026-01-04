@@ -104,6 +104,18 @@ export default async function DashboardPage() {
             <p className="text-gray-600 mb-6">
               Create your first monitor to start tracking price and content changes
             </p>
+            
+            {/* Onboarding Example */}
+            <div className="max-w-md mx-auto mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <h4 className="font-semibold text-gray-900 mb-2">Example Monitor</h4>
+              <p className="text-sm text-gray-700 mb-3">
+                Monitor example.com for price changes using CSS selector &quot;.price&quot;
+              </p>
+              <div className="text-xs text-gray-600 bg-white p-2 rounded border border-gray-200 mb-3">
+                <strong>Tip:</strong> Right-click → Inspect → Copy selector to find the right CSS selector for your target element
+              </div>
+            </div>
+            
             <Link
               href="/monitors/new"
               className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700"
@@ -155,17 +167,26 @@ export default async function DashboardPage() {
                         : 'Never'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span
-                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          monitor.last_status === 'ok'
-                            ? 'bg-green-100 text-green-800'
-                            : monitor.last_status === 'error'
-                            ? 'bg-red-100 text-red-800'
-                            : 'bg-gray-100 text-gray-800'
-                        }`}
-                      >
-                        {monitor.is_active ? monitor.last_status : 'inactive'}
-                      </span>
+                      <div className="flex items-center">
+                        <span
+                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                            monitor.last_status === 'ok'
+                              ? 'bg-green-100 text-green-800'
+                              : monitor.last_status === 'error'
+                              ? 'bg-red-100 text-red-800'
+                              : monitor.last_status === 'blocked'
+                              ? 'bg-yellow-100 text-yellow-800'
+                              : 'bg-gray-100 text-gray-800'
+                          }`}
+                        >
+                          {monitor.is_active ? monitor.last_status : 'inactive'}
+                        </span>
+                        {monitor.last_status === 'error' && monitor.last_error && (
+                          <span className="ml-2 text-xs text-red-600" title={monitor.last_error}>
+                            ⚠️
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       <Link
