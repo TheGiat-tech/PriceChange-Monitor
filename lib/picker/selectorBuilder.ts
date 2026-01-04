@@ -174,10 +174,17 @@ export function buildSelector(element: ElementInfo): string {
 
     // Add the target element
     try {
-      const nthOfType = typeof element.nthOfType === 'number' && element.nthOfType > 0 ? element.nthOfType : 1
-      const targetPart = buildSimpleSelector(element) || 
-        `${element.tagName.toLowerCase()}:nth-of-type(${nthOfType})`
-      pathParts.push(targetPart)
+      const nthOfType = typeof element.nthOfType === 'number' && element.nthOfType > 0 ? element.nthOfType : null
+      const simpleSelector = buildSimpleSelector(element)
+      
+      if (simpleSelector) {
+        pathParts.push(simpleSelector)
+      } else if (nthOfType) {
+        pathParts.push(`${element.tagName.toLowerCase()}:nth-of-type(${nthOfType})`)
+      } else {
+        // If no valid nth-of-type, just use the tag name
+        pathParts.push(element.tagName.toLowerCase())
+      }
     } catch {
       // Fallback to just the tag name
       pathParts.push(element.tagName.toLowerCase())

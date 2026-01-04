@@ -225,19 +225,17 @@ function PickerContent() {
           onLoad={() => {
             // If still loading after iframe loads, give it a moment for the script to initialize
             if (state === 'loading') {
-              const initTimer = setTimeout(() => {
-                // Use a ref check to ensure we're still in loading state
+              setTimeout(() => {
+                // Check state again before updating
                 setState((currentState) => {
                   if (currentState === 'loading') {
-                    setError("This page can't be previewed")
                     return 'error'
                   }
                   return currentState
                 })
+                // Set error message separately to avoid state update conflicts
+                setError("This page can't be previewed")
               }, PICKER_INITIALIZATION_TIMEOUT)
-              
-              // Cleanup timeout if component unmounts
-              return () => clearTimeout(initTimer)
             }
           }}
         />

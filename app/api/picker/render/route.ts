@@ -127,7 +127,7 @@ export async function GET(request: NextRequest) {
         if (fetchError.name === 'AbortError') {
           return NextResponse.json(
             { success: false, error: 'Page took too long to load' },
-            { status: 408 }
+            { status: 504 }
           )
         }
         // Network errors, DNS failures, etc.
