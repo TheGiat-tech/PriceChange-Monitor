@@ -22,7 +22,7 @@ export default function LoginPage() {
 
     try {
       if (isSignUp) {
-        const { data, error: signUpError } = await supabase.auth.signUp({
+        const { error: signUpError } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -32,23 +32,9 @@ export default function LoginPage() {
 
         if (signUpError) throw signUpError
 
-        if (data.user) {
-          // Create profile
-          const { error: profileError } = await supabase
-            .from('profiles')
-            .insert({
-              id: data.user.id,
-              email: data.user.email!,
-              plan: 'free',
-            })
-
-          if (profileError) {
-            console.error('Profile creation error:', profileError)
-          }
-
-          router.push('/dashboard')
-          router.refresh()
-        }
+        // Profile is automatically created by database trigger
+        router.push('/dashboard')
+        router.refresh()
       } else {
         const { error: signInError } = await supabase.auth.signInWithPassword({
           email,
