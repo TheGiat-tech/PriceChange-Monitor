@@ -47,11 +47,21 @@ export async function PATCH(
   try {
     const body = await request.json()
 
-    // Get user's profile to check plan
+    // Ensure profile exists for the user (create if it doesn't exist)
     const { data: profile } = await supabase
       .from('profiles')
+      .upsert(
+        {
+          id: user.id,
+          email: user.email || '',
+          plan: 'free',
+        },
+        {
+          onConflict: 'id',
+          ignoreDuplicates: false,
+        }
+      )
       .select('plan')
-      .eq('id', user.id)
       .single()
 
     const plan = (profile?.plan || 'free') as Plan
