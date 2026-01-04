@@ -3,6 +3,10 @@
  * Prioritizes stable attributes over fragile positional selectors.
  */
 
+// Class name length constraints for semantic detection
+const MIN_CLASS_NAME_LENGTH = 3
+const MAX_CLASS_NAME_LENGTH = 20
+
 // Common data-* attributes used for testing (most stable)
 const DATA_ATTRIBUTES = [
   'data-testid',
@@ -75,7 +79,7 @@ function isStableClass(className: string): boolean {
     return true
   }
   // Accept short, simple class names (likely semantic)
-  if (className.length >= 3 && className.length <= 20 && /^[a-z][a-z0-9-_]*$/i.test(className)) {
+  if (className.length >= MIN_CLASS_NAME_LENGTH && className.length <= MAX_CLASS_NAME_LENGTH && /^[a-z][a-z0-9-_]*$/i.test(className)) {
     return true
   }
   return false

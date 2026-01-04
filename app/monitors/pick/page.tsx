@@ -6,6 +6,9 @@ import { PrimaryButton, SecondaryButton } from '@/components/ios'
 import { buildSelector, type ElementInfo } from '@/lib/picker/selectorBuilder'
 import { normalizeText } from '@/lib/picker/normalizeText'
 
+// Time to wait for picker script to initialize in iframe (ms)
+const PICKER_INITIALIZATION_TIMEOUT = 5000
+
 type PickerState = 'loading' | 'ready' | 'error' | 'selected'
 
 interface SelectedElement {
@@ -191,7 +194,7 @@ function PickerContent() {
                   setState('error')
                   setError("This page can't be previewed")
                 }
-              }, 5000)
+              }, PICKER_INITIALIZATION_TIMEOUT)
             }
           }}
         />

@@ -73,8 +73,11 @@ export function sanitizeHtml(
         if (EVENT_HANDLER_PATTERN.test(attr)) {
           element.removeAttr(attr)
         }
-        // Also remove javascript: URLs
-        if (attribs[attr]?.toLowerCase().startsWith('javascript:')) {
+        // Remove dangerous URL schemes (javascript:, vbscript:, data: for scripts)
+        const value = attribs[attr]?.toLowerCase() || ''
+        if (value.startsWith('javascript:') || 
+            value.startsWith('vbscript:') ||
+            (value.startsWith('data:') && (value.includes('text/html') || value.includes('text/javascript')))) {
           element.removeAttr(attr)
         }
       }
@@ -124,20 +127,16 @@ export function sanitizeHtml(
       })
     }
 
-    // Handle inline styles with url()
+    // Handle inline styles with url() - remove them entirely to prevent potential bypasses
+    // This is safer than trying to rewrite URLs in CSS which has many edge cases
     $('[style]').each((_, el) => {
       const element = $(el)
       const style = element.attr('style') || ''
       
       if (style.includes('url(')) {
-        const newStyle = style.replace(
-          /url\(['"]?([^'")\s]+)['"]?\)/gi,
-          (match, url) => {
-            if (url.startsWith('data:')) return match
-            return `url('${resolveUrl(url, baseUrl)}')`
-          }
-        )
-        element.attr('style', newStyle)
+        // Remove url() references from inline styles for security
+        const safeStyle = style.replace(/url\([^)]*\)/gi, 'none')
+        element.attr('style', safeStyle)
       }
     })
 

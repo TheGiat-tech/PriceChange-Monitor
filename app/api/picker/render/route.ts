@@ -177,6 +177,12 @@ export async function GET(request: NextRequest) {
     }
 
     // Return as HTML with security headers
+    // Note: 'unsafe-inline' is required for our picker script to work.
+    // This is mitigated by:
+    // 1. HTML sanitization removes all original scripts and event handlers
+    // 2. We only inject our trusted picker script
+    // 3. frame-ancestors 'self' prevents embedding by external sites
+    // 4. The rendered content is ephemeral and not stored
     return new NextResponse(finalHtml, {
       status: 200,
       headers: {
