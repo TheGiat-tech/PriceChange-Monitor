@@ -2,105 +2,73 @@ import Link from 'next/link'
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-gradient-to-b from-white to-gray-50">
-      <div className="max-w-6xl mx-auto px-4 py-16">
+    <main className="min-h-screen bg-ios-bg">
+      <div className="max-w-md mx-auto px-4 py-8">
         {/* Header */}
-        <header className="flex justify-between items-center mb-16">
-          <h1 className="text-2xl font-bold text-gray-900">PricePing</h1>
-          <nav className="space-x-4">
-            <Link 
-              href="/pricing" 
-              className="text-gray-600 hover:text-gray-900"
-            >
-              Pricing
-            </Link>
-            <Link 
-              href="/login" 
-              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
-            >
-              Sign In
-            </Link>
-          </nav>
+        <header className="flex justify-between items-center mb-12">
+          <h1 className="text-2xl font-semibold text-ios-label">PricePing</h1>
+          <Link 
+            href="/login" 
+            className="text-ios-tint text-[15px] font-medium"
+          >
+            Sign In
+          </Link>
         </header>
 
         {/* Hero Section */}
-        <div className="text-center mb-16">
-          <h2 className="text-5xl font-bold text-gray-900 mb-6">
-            Monitor Price & Content Changes
-            <br />
-            <span className="text-blue-600">Simple. Easy. Affordable.</span>
+        <div className="text-center mb-12">
+          <h2 className="text-[28px] font-semibold text-ios-label mb-4 leading-tight">
+            Monitor Price Changes
           </h2>
-          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Get instant email alerts when prices drop or content changes on any website. 
-            Like Visualping but simpler and cheaper.
+          <p className="text-[15px] text-ios-secondary mb-8 leading-relaxed">
+            Get instant email alerts when prices drop or content changes on any website.
           </p>
           <Link 
             href="/login" 
-            className="inline-block bg-blue-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-700"
+            className="inline-block w-full max-w-xs bg-ios-tint text-white px-8 h-12 rounded-lg text-[15px] font-semibold active:scale-[0.98] transition-transform flex items-center justify-center"
           >
-            Start Monitoring Free
+            Get Started
           </Link>
         </div>
 
         {/* Features */}
-        <div className="grid md:grid-cols-3 gap-8 mb-16">
-          <div className="bg-white p-6 rounded-lg shadow-sm">
-            <div className="text-3xl mb-4">🎯</div>
-            <h3 className="text-xl font-semibold mb-2">Precise Monitoring</h3>
-            <p className="text-gray-600">
-              Monitor specific elements on a page using CSS selectors. No screenshots, just clean text tracking.
+        <div className="space-y-4 mb-12">
+          <div className="bg-ios-card p-6 rounded-ioslg shadow-ios">
+            <div className="text-3xl mb-3">🎯</div>
+            <h3 className="text-[18px] font-semibold mb-2 text-ios-label">Precise Monitoring</h3>
+            <p className="text-[14px] text-ios-secondary leading-relaxed">
+              Monitor specific elements using CSS selectors for accurate tracking.
             </p>
           </div>
-          <div className="bg-white p-6 rounded-lg shadow-sm">
-            <div className="text-3xl mb-4">⚡</div>
-            <h3 className="text-xl font-semibold mb-2">Instant Alerts</h3>
-            <p className="text-gray-600">
-              Get email notifications the moment a change is detected. Choose check intervals from hourly to daily.
+          <div className="bg-ios-card p-6 rounded-ioslg shadow-ios">
+            <div className="text-3xl mb-3">⚡</div>
+            <h3 className="text-[18px] font-semibold mb-2 text-ios-label">Instant Alerts</h3>
+            <p className="text-[14px] text-ios-secondary leading-relaxed">
+              Email notifications when changes are detected. Choose hourly to daily intervals.
             </p>
           </div>
-          <div className="bg-white p-6 rounded-lg shadow-sm">
-            <div className="text-3xl mb-4">💰</div>
-            <h3 className="text-xl font-semibold mb-2">Affordable Pricing</h3>
-            <p className="text-gray-600">
-              Start free with 1 monitor. Upgrade to Pro for just a few dollars to monitor up to 20 pages.
+          <div className="bg-ios-card p-6 rounded-ioslg shadow-ios">
+            <div className="text-3xl mb-3">💰</div>
+            <h3 className="text-[18px] font-semibold mb-2 text-ios-label">Affordable Pricing</h3>
+            <p className="text-[14px] text-ios-secondary leading-relaxed">
+              Start free with 1 monitor. Upgrade to Pro to monitor up to 20 pages.
             </p>
-          </div>
-        </div>
-
-        {/* How It Works */}
-        <div className="bg-white rounded-lg p-8 shadow-sm">
-          <h3 className="text-2xl font-bold text-center mb-8">How It Works</h3>
-          <div className="grid md:grid-cols-4 gap-6">
-            <div className="text-center">
-              <div className="bg-blue-100 text-blue-600 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">
-                1
-              </div>
-              <p className="text-gray-600">Add the URL you want to monitor</p>
-            </div>
-            <div className="text-center">
-              <div className="bg-blue-100 text-blue-600 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">
-                2
-              </div>
-              <p className="text-gray-600">Specify the CSS selector for the element</p>
-            </div>
-            <div className="text-center">
-              <div className="bg-blue-100 text-blue-600 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">
-                3
-              </div>
-              <p className="text-gray-600">Choose your check interval</p>
-            </div>
-            <div className="text-center">
-              <div className="bg-blue-100 text-blue-600 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">
-                4
-              </div>
-              <p className="text-gray-600">Get instant email alerts on changes</p>
-            </div>
           </div>
         </div>
 
         {/* Footer */}
-        <footer className="mt-16 text-center text-gray-500">
-          <p>&copy; 2024 PricePing. All rights reserved.</p>
+        <footer className="mt-16 text-center space-y-2">
+          <div className="flex justify-center gap-4 text-xs text-ios-secondary">
+            <Link href="/terms" className="hover:text-ios-label">
+              Terms
+            </Link>
+            <Link href="/privacy" className="hover:text-ios-label">
+              Privacy
+            </Link>
+            <Link href="/pricing" className="hover:text-ios-label">
+              Pricing
+            </Link>
+          </div>
         </footer>
       </div>
     </main>
