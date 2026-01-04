@@ -37,7 +37,8 @@ export async function POST(request: Request) {
   }
 
   // Ensure profile exists for the user (create if it doesn't exist)
-  const { data: profile } = await supabase
+  // First, try to upsert (will create if doesn't exist, ignore if exists)
+  await supabase
     .from('profiles')
     .upsert(
       {
@@ -50,7 +51,12 @@ export async function POST(request: Request) {
         ignoreDuplicates: true,
       }
     )
+  
+  // Then fetch the profile (this will always return the profile)
+  const { data: profile } = await supabase
+    .from('profiles')
     .select('plan')
+    .eq('id', user.id)
     .single()
 
   const plan = (profile?.plan || 'free') as Plan
