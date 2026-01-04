@@ -64,9 +64,9 @@ export default async function MonitorDetailPage({
 
   return (
     <IOSContainer>
-      <div className="mb-4">
-        <Link href="/dashboard" className="text-ios-tint text-sm font-medium">
-          ← Back to Dashboard
+      <div className="mb-6">
+        <Link href="/dashboard" className="text-ios-tint text-[15px]">
+          ← Back
         </Link>
         <div className="flex items-center justify-between mt-2">
           <h1 className="text-[28px] font-semibold text-ios-label">
@@ -77,24 +77,21 @@ export default async function MonitorDetailPage({
       </div>
 
       {/* Monitor Info */}
-      <IOSCard title="CONFIGURATION" className="mb-4">
+      <IOSCard className="mb-6">
         <IOSRow label="URL" value={monitor.url.substring(0, 30) + '...'} />
-        <div className="h-px bg-ios-separator mx-4" />
+        <div className="h-px bg-ios-separator" />
         <IOSRow label="Selector" value={monitor.selector} />
-        <div className="h-px bg-ios-separator mx-4" />
+        <div className="h-px bg-ios-separator" />
         <IOSRow 
-          label="Check Interval" 
+          label="Interval" 
           value={
             monitor.interval_minutes === 60 ? 'Hourly' :
             monitor.interval_minutes === 240 ? 'Every 4h' : 'Daily'
           } 
         />
-        <div className="h-px bg-ios-separator mx-4" />
+        <div className="h-px bg-ios-separator" />
         <IOSRow label="Email" value={monitor.notification_email} />
-      </IOSCard>
-
-      {/* Current Status */}
-      <IOSCard title="CURRENT STATUS" className="mb-4">
+        <div className="h-px bg-ios-separator" />
         <IOSRow 
           label="Last Check" 
           value={monitor.last_checked_at 
@@ -102,16 +99,16 @@ export default async function MonitorDetailPage({
             : 'Never'
           } 
         />
-        <div className="h-px bg-ios-separator mx-4" />
+        <div className="h-px bg-ios-separator" />
         <IOSRow 
           label="Last Value" 
           value={monitor.last_value ? monitor.last_value.substring(0, 20) : 'None'} 
         />
         {monitor.last_error && (
           <>
-            <div className="h-px bg-ios-separator mx-4" />
+            <div className="h-px bg-ios-separator" />
             <div className="px-4 py-3">
-              <div className="text-sm text-ios-secondary mb-1">Last Error</div>
+              <div className="text-[13px] text-ios-secondary mb-1">Last Error</div>
               <div className="text-xs text-red-600">{monitor.last_error}</div>
             </div>
           </>
@@ -119,37 +116,37 @@ export default async function MonitorDetailPage({
       </IOSCard>
 
       {/* Actions */}
-      <IOSCard className="mb-4">
+      <IOSCard className="mb-6">
         <form action={handleToggleActive}>
           <button type="submit" className="w-full">
             <IOSRow 
-              label={monitor.is_active ? 'Pause Monitor' : 'Activate Monitor'} 
+              label={monitor.is_active ? 'Pause' : 'Activate'} 
               className={monitor.is_active ? 'text-yellow-600' : 'text-green-600'}
             />
           </button>
         </form>
-        <div className="h-px bg-ios-separator mx-4" />
+        <div className="h-px bg-ios-separator" />
         <form action={handleDelete}>
           <button 
             type="submit" 
             className="w-full"
             onClick={(e) => {
-              if (!confirm('Are you sure you want to delete this monitor?')) {
+              if (!confirm('Delete this monitor?')) {
                 e.preventDefault()
               }
             }}
           >
-            <IOSRow label="Delete Monitor" className="text-red-600" />
+            <IOSRow label="Delete" className="text-red-600" />
           </button>
         </form>
       </IOSCard>
 
       {/* Change History */}
-      {events && events.length > 0 && (
-        <IOSCard title="CHANGE HISTORY" className="mb-4">
+      {events && events.length > 0 ? (
+        <IOSCard className="mb-6">
           {events.map((event, index) => (
             <div key={event.id}>
-              {index > 0 && <div className="h-px bg-ios-separator mx-4" />}
+              {index > 0 && <div className="h-px bg-ios-separator" />}
               <div className="px-4 py-3">
                 <div className="text-xs text-ios-secondary mb-2">
                   {new Date(event.changed_at).toLocaleString()}
@@ -172,12 +169,10 @@ export default async function MonitorDetailPage({
             </div>
           ))}
         </IOSCard>
-      )}
-
-      {(!events || events.length === 0) && (
-        <IOSCard className="mb-4">
-          <div className="p-8 text-center">
-            <p className="text-ios-secondary text-sm">No changes detected yet</p>
+      ) : (
+        <IOSCard className="mb-6">
+          <div className="px-4 py-12 text-center">
+            <p className="text-ios-secondary text-[15px]">No changes yet</p>
           </div>
         </IOSCard>
       )}

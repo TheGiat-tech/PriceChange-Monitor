@@ -20,7 +20,7 @@ export default function TintButton({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`w-full h-12 bg-ios-tint text-white font-semibold text-[15px] rounded-lg active:scale-[0.98] transition-transform disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+      className={`w-full h-11 bg-black text-white font-semibold text-[15px] rounded-[22px] active:opacity-80 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed ${className}`}
     >
       {children}
     </button>

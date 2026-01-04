@@ -70,13 +70,13 @@ export default function LoginPage() {
   return (
     <IOSContainer>
       <div className="flex flex-col items-center justify-center min-h-[80vh]">
-        <Link href="/" className="mb-8">
+        <Link href="/" className="mb-12">
           <h1 className="text-[28px] font-semibold text-ios-label">PricePing</h1>
         </Link>
 
         <IOSCard className="w-full">
           <div className="p-6">
-            <h2 className="text-[22px] font-semibold text-ios-label text-center mb-6">
+            <h2 className="text-[22px] font-semibold text-ios-label text-center mb-8">
               {isSignUp ? 'Create Account' : 'Sign In'}
             </h2>
 
@@ -107,18 +107,20 @@ export default function LoginPage() {
                 placeholder="Enter your password"
               />
 
-              <TintButton type="submit" disabled={loading}>
-                {loading ? 'Loading...' : isSignUp ? 'Sign Up' : 'Sign In'}
-              </TintButton>
+              <div className="pt-2">
+                <TintButton type="submit" disabled={loading}>
+                  {loading ? 'Loading...' : isSignUp ? 'Sign Up' : 'Sign In'}
+                </TintButton>
+              </div>
             </form>
 
-            <div className="mt-6 pt-6 border-t border-ios-separator text-center">
+            <div className="mt-8 pt-6 border-t border-ios-separator text-center">
               <button
                 type="button"
                 onClick={() => setIsSignUp(!isSignUp)}
-                className="text-ios-tint text-[15px] font-medium"
+                className="text-ios-tint text-[15px]"
               >
-                {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
+                {isSignUp ? 'Already have an account?' : 'Create account'}
               </button>
             </div>
           </div>

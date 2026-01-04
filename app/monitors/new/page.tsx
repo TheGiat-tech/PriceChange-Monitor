@@ -83,8 +83,8 @@ export default function NewMonitorPage() {
 
   return (
     <IOSContainer>
-      <div className="mb-4">
-        <Link href="/dashboard" className="text-ios-tint text-sm font-medium">
+      <div className="mb-6">
+        <Link href="/dashboard" className="text-ios-tint text-[15px]">
           ← Back
         </Link>
         <h1 className="text-[28px] font-semibold text-ios-label mt-2">Create Monitor</h1>
@@ -92,7 +92,7 @@ export default function NewMonitorPage() {
 
       <IOSCard>
         <div className="p-6">
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-ios text-sm">
                 {error}
@@ -111,13 +111,13 @@ export default function NewMonitorPage() {
             />
 
             <IOSInput
-              label="Label (optional)"
+              label="Label"
               type="text"
               id="label"
               maxLength={100}
               value={formData.label}
               onChange={(e) => setFormData({ ...formData, label: e.target.value })}
-              placeholder="My Product"
+              placeholder="Optional"
             />
 
             <IOSInput
@@ -132,19 +132,20 @@ export default function NewMonitorPage() {
               helperText="Right-click → Inspect → Copy selector"
             />
 
-            <SecondaryButton
+            <button
               type="button"
               onClick={handleTest}
               disabled={!formData.url || !formData.selector || testing}
+              className="text-ios-tint text-[15px] disabled:opacity-40"
             >
-              {testing ? 'Testing...' : 'Test Selector'}
-            </SecondaryButton>
+              {testing ? 'Testing...' : 'Test selector'}
+            </button>
 
             {testResult && (
               <div className={`p-4 rounded-ios text-sm ${testResult.success ? 'bg-green-50 border border-green-200 text-green-800' : 'bg-red-50 border border-red-200 text-red-600'}`}>
                 {testResult.success ? (
                   <div>
-                    <p className="font-medium mb-1">✓ Selector found!</p>
+                    <p className="font-medium mb-1">✓ Found</p>
                     <p className="text-xs">Value: <span className="font-mono">{testResult.value}</span></p>
                   </div>
                 ) : (
@@ -154,7 +155,7 @@ export default function NewMonitorPage() {
             )}
 
             <div>
-              <label htmlFor="value_type" className="block text-sm font-medium text-ios-label mb-2">
+              <label htmlFor="value_type" className="block text-[13px] font-medium text-ios-label mb-2">
                 Value Type
               </label>
               <select
@@ -169,8 +170,8 @@ export default function NewMonitorPage() {
             </div>
 
             <div>
-              <label htmlFor="interval_minutes" className="block text-sm font-medium text-ios-label mb-2">
-                Check Interval <span className="text-red-500">*</span>
+              <label htmlFor="interval_minutes" className="block text-[13px] font-medium text-ios-label mb-2">
+                Check Interval
               </label>
               <select
                 id="interval_minutes"
@@ -202,8 +203,8 @@ export default function NewMonitorPage() {
                 onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
                 className="h-5 w-5 text-ios-tint focus:ring-ios-tint border-gray-300 rounded"
               />
-              <label htmlFor="is_active" className="ml-3 text-sm text-ios-label">
-                Monitor is active
+              <label htmlFor="is_active" className="ml-3 text-[15px] text-ios-label">
+                Active
               </label>
             </div>
 
@@ -213,7 +214,7 @@ export default function NewMonitorPage() {
               </Link>
               <div className="flex-1">
                 <PrimaryButton type="submit" disabled={loading}>
-                  {loading ? 'Creating...' : 'Create Monitor'}
+                  {loading ? 'Creating...' : 'Create'}
                 </PrimaryButton>
               </div>
             </div>

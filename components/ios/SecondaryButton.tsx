@@ -20,7 +20,7 @@ export default function SecondaryButton({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`w-full h-12 bg-ios-bg text-ios-label font-semibold text-[15px] rounded-lg active:scale-[0.98] transition-transform disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+      className={`w-full h-11 bg-white border border-ios-separator text-ios-label font-medium text-[15px] rounded-[22px] active:bg-black/5 transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${className}`}
     >
       {children}
     </button>
