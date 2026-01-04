@@ -47,7 +47,7 @@ export default function PricingPage() {
           </div>
           <p className="text-[13px] text-ios-secondary mb-3">1 monitor, daily checks</p>
           <Link href="/login">
-            <button className="text-ios-tint text-[17px] font-medium">Get Started</button>
+            <button className="text-ios-tint text-[17px] font-medium focus:outline-none focus:underline">Get Started</button>
           </Link>
         </div>
         
@@ -62,7 +62,7 @@ export default function PricingPage() {
           <button 
             onClick={handleUpgrade} 
             disabled={loading}
-            className="text-ios-tint text-[17px] font-medium disabled:opacity-40"
+            className="text-ios-tint text-[17px] font-medium disabled:opacity-40 focus:outline-none focus:underline"
           >
             {loading ? 'Processing...' : 'Upgrade to Pro'}
           </button>

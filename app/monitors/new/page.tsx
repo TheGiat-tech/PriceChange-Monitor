@@ -136,7 +136,7 @@ export default function NewMonitorPage() {
               type="button"
               onClick={handleTest}
               disabled={!formData.url || !formData.selector || testing}
-              className="text-ios-tint text-[15px] disabled:opacity-40"
+              className="text-ios-tint text-[15px] disabled:opacity-40 focus:outline-none focus:underline"
             >
               {testing ? 'Testing...' : 'Test selector'}
             </button>
