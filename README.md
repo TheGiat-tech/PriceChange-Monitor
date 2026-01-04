@@ -59,13 +59,15 @@ Edit `.env` and fill in your credentials:
 
 4. Set up the database:
 
-In your Supabase project, run the migration file:
+In your Supabase project, run the migration files in order:
 ```sql
--- Execute the contents of supabase/migrations/001_initial_schema.sql
--- in your Supabase SQL Editor
+-- Execute the contents of these files in your Supabase SQL Editor:
+-- 1. supabase/migrations/001_initial_schema.sql
+-- 2. supabase/migrations/002_add_production_fields.sql
+-- 3. supabase/migrations/003_auto_create_profiles.sql
 ```
 
-This will create the necessary tables (profiles, monitors, events) and RLS policies.
+This will create the necessary tables (profiles, monitors, events), RLS policies, and triggers to automatically create user profiles on signup.
 
 5. Run the development server:
 ```bash
