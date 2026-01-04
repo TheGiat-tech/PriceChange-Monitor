@@ -13,14 +13,25 @@ export async function POST() {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
+  // Ensure profile exists for the user (create if it doesn't exist)
   const { data: profile } = await supabase
     .from('profiles')
+    .upsert(
+      {
+        id: user.id,
+        email: user.email || '',
+        plan: 'free',
+      },
+      {
+        onConflict: 'id',
+        ignoreDuplicates: true,
+      }
+    )
     .select('stripe_customer_id, email')
-    .eq('id', user.id)
     .single()
 
   if (!profile) {
-    return NextResponse.json({ error: 'Profile not found' }, { status: 404 })
+    return NextResponse.json({ error: 'Failed to create profile' }, { status: 500 })
   }
 
   try {
