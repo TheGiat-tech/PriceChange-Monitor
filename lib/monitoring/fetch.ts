@@ -16,7 +16,7 @@ export async function fetchAndExtract(
   if (isBlockedUrl(url)) {
     return {
       success: false,
-      error: 'URL is blocked for security reasons',
+      error: 'blocked_by_site',
     }
   }
 
@@ -27,13 +27,20 @@ export async function fetchAndExtract(
     const response = await fetch(url, {
       signal: controller.signal,
       headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; PricePing/1.0; +https://priceping.app)',
+        'User-Agent': 'PricePingBot/1.0 (+https://priceping.app)',
       },
     })
 
     clearTimeout(timeout)
 
     if (!response.ok) {
+      // Check if we're being blocked
+      if (response.status === 403 || response.status === 429) {
+        return {
+          success: false,
+          error: 'blocked_by_site',
+        }
+      }
       return {
         success: false,
         error: `HTTP ${response.status}: ${response.statusText}`,
@@ -47,7 +54,7 @@ export async function fetchAndExtract(
     if (element.length === 0) {
       return {
         success: false,
-        error: 'Selector not found',
+        error: 'selector_not_found',
       }
     }
 
@@ -64,18 +71,18 @@ export async function fetchAndExtract(
       if (error.name === 'AbortError') {
         return {
           success: false,
-          error: 'Request timeout',
+          error: 'fetch_timeout',
         }
       }
       return {
         success: false,
-        error: error.message,
+        error: 'parse_error',
       }
     }
     
     return {
       success: false,
-      error: 'Unknown error occurred',
+      error: 'parse_error',
     }
   }
 }

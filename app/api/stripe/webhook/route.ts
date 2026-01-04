@@ -44,6 +44,7 @@ export async function POST(request: Request) {
           .update({
             stripe_customer_id: session.customer as string,
             stripe_subscription_id: session.subscription as string,
+            billing_provider: 'stripe',
             plan: 'pro',
             subscription_status: 'active',
           })
@@ -73,6 +74,7 @@ export async function POST(request: Request) {
         await supabase
           .from('profiles')
           .update({
+            billing_provider: 'stripe',
             plan: isActive ? 'pro' : 'free',
             subscription_status: subscription.status,
             plan_expires_at: subscription.current_period_end

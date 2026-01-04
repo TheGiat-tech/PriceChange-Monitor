@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { canCreateMonitor, canUseInterval, getPlanViolationMessage, type Plan } from '@/lib/plan'
 import { NextResponse } from 'next/server'
 
 export const runtime = 'nodejs'
@@ -45,6 +46,53 @@ export async function PATCH(
 
   try {
     const body = await request.json()
+
+    // Get user's profile to check plan
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('plan')
+      .eq('id', user.id)
+      .single()
+
+    const plan = (profile?.plan || 'free') as Plan
+
+    // Get existing monitor to check current state
+    const { data: existingMonitor } = await supabase
+      .from('monitors')
+      .select('is_active')
+      .eq('id', id)
+      .eq('user_id', user.id)
+      .single()
+
+    if (!existingMonitor) {
+      return NextResponse.json({ error: 'Monitor not found' }, { status: 404 })
+    }
+
+    // If activating a monitor, check plan limits
+    if (body.is_active === true && !existingMonitor.is_active) {
+      const { count } = await supabase
+        .from('monitors')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .eq('is_active', true)
+
+      if (!canCreateMonitor(plan, count || 0)) {
+        return NextResponse.json(
+          { error: getPlanViolationMessage(plan, 'monitor_limit') },
+          { status: 403 }
+        )
+      }
+    }
+
+    // If updating interval, check plan limits
+    if (body.interval_minutes !== undefined) {
+      if (!canUseInterval(plan, body.interval_minutes)) {
+        return NextResponse.json(
+          { error: getPlanViolationMessage(plan, 'interval_limit') },
+          { status: 403 }
+        )
+      }
+    }
 
     const { data: monitor, error } = await supabase
       .from('monitors')
