@@ -1,27 +1,20 @@
 import Link from 'next/link'
+import { IOSContainer } from '@/components/ios'
 
 export default function TermsPage() {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm">
-        <div className="max-w-4xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center">
-            <Link href="/" className="text-2xl font-bold text-gray-900">
-              PricePing
-            </Link>
-            <Link href="/" className="text-blue-600 hover:text-blue-700">
-              Back to Home
-            </Link>
-          </div>
+    <div className="min-h-screen bg-ios-bg">
+      <IOSContainer>
+        <div className="mb-4">
+          <Link href="/" className="text-ios-tint text-sm font-medium">
+            ← Back to Home
+          </Link>
+          <h1 className="text-[28px] font-semibold text-ios-label mt-2">Terms of Service</h1>
         </div>
-      </header>
-
-      <main className="max-w-4xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
-        <h1 className="text-4xl font-bold text-gray-900 mb-8">Terms of Service</h1>
         
-        <div className="bg-white rounded-lg shadow-sm p-8 space-y-6 text-gray-700">
+        <div className="bg-ios-card rounded-ioslg shadow-ios p-6 space-y-6 text-ios-secondary text-[14px]">
           <section>
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">1. Acceptance of Terms</h2>
+            <h2 className="text-[18px] font-semibold text-ios-label mb-3">1. Acceptance of Terms</h2>
             <p>
               By accessing and using PricePing (&quot;the Service&quot;), you accept and agree to be bound by the terms 
               and provision of this agreement. If you do not agree to these terms, please do not use the Service.
@@ -29,7 +22,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">2. Description of Service</h2>
+            <h2 className="text-[18px] font-semibold text-ios-label mb-3">2. Description of Service</h2>
             <p>
               PricePing provides website content and price monitoring services. The Service allows you to monitor 
               specified web pages for changes and receive email notifications when changes are detected.
@@ -37,7 +30,7 @@ export default function TermsPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">3. User Responsibilities</h2>
+            <h2 className="text-[18px] font-semibold text-ios-label mb-3">3. User Responsibilities</h2>
             <p className="mb-2">You agree to:</p>
             <ul className="list-disc pl-6 space-y-2">
               <li>Provide accurate and complete information when creating an account</li>

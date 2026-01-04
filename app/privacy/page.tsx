@@ -1,36 +1,29 @@
 import Link from 'next/link'
+import { IOSContainer } from '@/components/ios'
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm">
-        <div className="max-w-4xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center">
-            <Link href="/" className="text-2xl font-bold text-gray-900">
-              PricePing
-            </Link>
-            <Link href="/" className="text-blue-600 hover:text-blue-700">
-              Back to Home
-            </Link>
-          </div>
+    <div className="min-h-screen bg-ios-bg">
+      <IOSContainer>
+        <div className="mb-4">
+          <Link href="/" className="text-ios-tint text-sm font-medium">
+            ← Back to Home
+          </Link>
+          <h1 className="text-[28px] font-semibold text-ios-label mt-2">Privacy Policy</h1>
         </div>
-      </header>
-
-      <main className="max-w-4xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
-        <h1 className="text-4xl font-bold text-gray-900 mb-8">Privacy Policy</h1>
         
-        <div className="bg-white rounded-lg shadow-sm p-8 space-y-6 text-gray-700">
+        <div className="bg-ios-card rounded-ioslg shadow-ios p-6 space-y-6 text-ios-secondary text-[14px]">
           <section>
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">1. Information We Collect</h2>
-            <p className="mb-4">We collect the following information when you use PricePing:</p>
+            <h2 className="text-[18px] font-semibold text-ios-label mb-3">1. Information We Collect</h2>
+            <p className="mb-3">We collect the following information when you use PricePing:</p>
             
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Account Information</h3>
+            <h3 className="text-[15px] font-semibold text-ios-label mb-2">Account Information</h3>
             <ul className="list-disc pl-6 space-y-2 mb-4">
               <li>Email address (used for authentication and notifications)</li>
               <li>Subscription and billing information (processed securely through Stripe and PayPal)</li>
             </ul>
 
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Monitor Data</h3>
+            <h3 className="text-[15px] font-semibold text-ios-label mb-2">Monitor Data</h3>
             <ul className="list-disc pl-6 space-y-2">
               <li>URLs of websites you choose to monitor</li>
               <li>CSS selectors for content extraction</li>
@@ -40,7 +33,7 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">2. How We Use Your Information</h2>
+            <h2 className="text-[18px] font-semibold text-ios-label mb-3">2. How We Use Your Information</h2>
             <p className="mb-2">We use your information to:</p>
             <ul className="list-disc pl-6 space-y-2">
               <li>Provide and maintain the monitoring service</li>

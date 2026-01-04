@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { IOSContainer, IOSCard, IOSRow, IOSBadge, TintButton, PrimaryButton } from '@/components/ios'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -26,6 +27,9 @@ export default async function DashboardPage() {
   const activeMonitorsCount = monitors?.filter(m => m.is_active).length || 0
   const maxMonitors = profile?.plan === 'pro' ? 20 : 1
 
+  // Get user initials for avatar
+  const userInitials = user.email?.substring(0, 2).toUpperCase() || 'U'
+
   const handleSignOut = async () => {
     'use server'
     const supabase = await createClient()
@@ -34,175 +38,122 @@ export default async function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <IOSContainer>
       {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold text-gray-900">PricePing</h1>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600">
-                Plan: <span className="font-semibold capitalize">{profile?.plan || 'free'}</span>
-              </span>
-              {profile?.plan !== 'pro' && (
-                <Link
-                  href="/pricing"
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm"
-                >
-                  Upgrade
-                </Link>
-              )}
-              <form action={handleSignOut}>
-                <button
-                  type="submit"
-                  className="text-gray-600 hover:text-gray-900 text-sm"
-                >
-                  Sign Out
-                </button>
-              </form>
+      <div className="mb-6">
+        <div className="flex justify-between items-center mb-1">
+          <h1 className="text-[28px] font-semibold text-ios-label">PricePing</h1>
+          <div className="flex items-center gap-3">
+            <Link
+              href="/pricing"
+              className="text-ios-tint text-sm font-medium"
+            >
+              {profile?.plan === 'pro' ? 'Pro' : 'Upgrade'}
+            </Link>
+            <div className="w-9 h-9 rounded-full bg-ios-tint text-white flex items-center justify-center text-sm font-semibold">
+              {userInitials}
             </div>
           </div>
         </div>
-      </header>
+        <div className="h-px bg-ios-separator" />
+      </div>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        {/* Stats */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <h2 className="text-xl font-semibold text-gray-900">Your Monitors</h2>
-              <p className="text-gray-600 mt-1">
-                {activeMonitorsCount} / {maxMonitors} active monitors
-              </p>
-            </div>
-            <Link
-              href="/monitors/new"
-              className={`px-6 py-3 rounded-lg font-semibold ${
-                activeMonitorsCount >= maxMonitors
-                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  : 'bg-blue-600 text-white hover:bg-blue-700'
-              }`}
-            >
-              Add Monitor
-            </Link>
-          </div>
+      {/* Welcome Card */}
+      <IOSCard className="mb-4">
+        <div className="p-6">
+          <h2 className="text-[18px] font-semibold text-ios-label mb-2">
+            Welcome back{user.email ? `, ${user.email.split('@')[0]}` : ''}
+          </h2>
+          <p className="text-[14px] text-ios-secondary mb-4">
+            You have {activeMonitorsCount} active monitor{activeMonitorsCount !== 1 ? 's' : ''}
+          </p>
+          <Link href="/monitors/new">
+            <TintButton disabled={activeMonitorsCount >= maxMonitors}>
+              + Add Monitor
+            </TintButton>
+          </Link>
           {activeMonitorsCount >= maxMonitors && (
-            <p className="text-sm text-red-600 mt-2">
-              You&apos;ve reached your monitor limit. {profile?.plan === 'free' && (
-                <Link href="/pricing" className="underline">Upgrade to Pro</Link>
-              )} to add more.
+            <p className="text-xs text-ios-secondary mt-2 text-center">
+              You&apos;ve reached your limit. {profile?.plan === 'free' && (
+                <Link href="/pricing" className="text-ios-tint">Upgrade to Pro</Link>
+              )}
             </p>
           )}
         </div>
+      </IOSCard>
 
-        {/* Monitors List */}
-        {!monitors || monitors.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-sm p-12 text-center">
-            <div className="text-6xl mb-4">📊</div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">No monitors yet</h3>
-            <p className="text-gray-600 mb-6">
-              Create your first monitor to start tracking price and content changes
+      {/* Active Monitors */}
+      {!monitors || monitors.length === 0 ? (
+        <IOSCard className="mb-4">
+          <div className="p-8 text-center">
+            <div className="text-5xl mb-4">📊</div>
+            <h3 className="text-[18px] font-semibold text-ios-label mb-2">No monitors yet</h3>
+            <p className="text-[14px] text-ios-secondary mb-6">
+              Create your first monitor to start tracking changes
             </p>
-            
-            {/* Onboarding Example */}
-            <div className="max-w-md mx-auto mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-              <h4 className="font-semibold text-gray-900 mb-2">Example Monitor</h4>
-              <p className="text-sm text-gray-700 mb-3">
-                Monitor example.com for price changes using CSS selector &quot;.price&quot;
-              </p>
-              <div className="text-xs text-gray-600 bg-white p-2 rounded border border-gray-200 mb-3">
-                <strong>Tip:</strong> Right-click → Inspect → Copy selector to find the right CSS selector for your target element
-              </div>
+          </div>
+        </IOSCard>
+      ) : (
+        <IOSCard title="ACTIVE MONITORS" className="mb-4">
+          {monitors.map((monitor, index) => (
+            <div key={monitor.id}>
+              {index > 0 && <div className="h-px bg-ios-separator mx-4" />}
+              <IOSRow
+                label={monitor.label || monitor.url}
+                secondary={`Checked ${monitor.last_checked_at ? new Date(monitor.last_checked_at).toLocaleDateString() : 'never'}`}
+                badge={
+                  <IOSBadge 
+                    status={monitor.is_active ? (monitor.last_status as any) : 'inactive'} 
+                  />
+                }
+                chevron
+                href={`/monitors/${monitor.id}`}
+              />
             </div>
-            
-            <Link
-              href="/monitors/new"
-              className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700"
-            >
-              Create Your First Monitor
+          ))}
+        </IOSCard>
+      )}
+
+      {/* Try Example Monitor Card */}
+      {(!monitors || monitors.length === 0) && (
+        <IOSCard className="mb-4">
+          <div className="p-6">
+            <h3 className="text-[18px] font-semibold text-ios-label mb-2">
+              Try an Example Monitor
+            </h3>
+            <p className="text-[14px] text-ios-secondary mb-4">
+              Monitor example.com and set alerts for price changes
+            </p>
+            <Link href="/monitors/new">
+              <PrimaryButton>Create from Example</PrimaryButton>
             </Link>
           </div>
-        ) : (
-          <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Monitor
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Interval
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Last Check
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {monitors.map((monitor) => (
-                  <tr key={monitor.id}>
-                    <td className="px-6 py-4">
-                      <div className="text-sm font-medium text-gray-900">
-                        {monitor.label || monitor.url}
-                      </div>
-                      <div className="text-sm text-gray-500 truncate max-w-md">
-                        {monitor.url}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {monitor.interval_minutes === 60 && 'Hourly'}
-                      {monitor.interval_minutes === 240 && 'Every 4 hours'}
-                      {monitor.interval_minutes === 1440 && 'Daily'}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {monitor.last_checked_at
-                        ? new Date(monitor.last_checked_at).toLocaleString()
-                        : 'Never'}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <span
-                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            monitor.last_status === 'ok'
-                              ? 'bg-green-100 text-green-800'
-                              : monitor.last_status === 'error'
-                              ? 'bg-red-100 text-red-800'
-                              : monitor.last_status === 'blocked'
-                              ? 'bg-yellow-100 text-yellow-800'
-                              : 'bg-gray-100 text-gray-800'
-                          }`}
-                        >
-                          {monitor.is_active ? monitor.last_status : 'inactive'}
-                        </span>
-                        {monitor.last_status === 'error' && monitor.last_error && (
-                          <span className="ml-2 text-xs text-red-600" title={monitor.last_error}>
-                            ⚠️
-                          </span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <Link
-                        href={`/monitors/${monitor.id}`}
-                        className="text-blue-600 hover:text-blue-900"
-                      >
-                        View Details
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </main>
-    </div>
+        </IOSCard>
+      )}
+
+      {/* Sign Out */}
+      <IOSCard className="mb-4">
+        <form action={handleSignOut}>
+          <button type="submit" className="w-full">
+            <IOSRow label="Sign Out" className="text-red-600" />
+          </button>
+        </form>
+      </IOSCard>
+
+      {/* Footer */}
+      <div className="mt-8 mb-4 text-center space-y-2">
+        <div className="flex justify-center gap-4 text-xs text-ios-secondary">
+          <Link href="/privacy" className="hover:text-ios-label">
+            Privacy
+          </Link>
+          <Link href="/terms" className="hover:text-ios-label">
+            Terms
+          </Link>
+          <Link href="/pricing" className="hover:text-ios-label">
+            Pricing
+          </Link>
+        </div>
+      </div>
+    </IOSContainer>
   )
 }

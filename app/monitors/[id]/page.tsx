@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { IOSContainer, IOSCard, IOSRow, IOSBadge, SecondaryButton } from '@/components/ios'
 
 export default async function MonitorDetailPage({
   params,
@@ -62,172 +63,124 @@ export default async function MonitorDetailPage({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
-          <div className="flex items-center">
-            <Link href="/dashboard" className="text-blue-600 hover:text-blue-700 mr-4">
-              ← Back to Dashboard
-            </Link>
-            <h1 className="text-2xl font-bold text-gray-900">Monitor Details</h1>
-          </div>
+    <IOSContainer>
+      <div className="mb-4">
+        <Link href="/dashboard" className="text-ios-tint text-sm font-medium">
+          ← Back to Dashboard
+        </Link>
+        <div className="flex items-center justify-between mt-2">
+          <h1 className="text-[28px] font-semibold text-ios-label">
+            {monitor.label || 'Monitor'}
+          </h1>
+          <IOSBadge status={monitor.is_active ? (monitor.last_status as any) : 'inactive'} />
         </div>
-      </header>
+      </div>
 
-      <main className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        {/* Monitor Info */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <div className="flex justify-between items-start mb-6">
-            <div className="flex-1">
-              <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                {monitor.label || 'Untitled Monitor'}
-              </h2>
-              <p className="text-gray-600 break-all">{monitor.url}</p>
-            </div>
-            <div className="flex space-x-2">
-              <form action={handleToggleActive}>
-                <button
-                  type="submit"
-                  className={`px-4 py-2 rounded-lg text-sm font-medium ${
-                    monitor.is_active
-                      ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200'
-                      : 'bg-green-100 text-green-800 hover:bg-green-200'
-                  }`}
-                >
-                  {monitor.is_active ? 'Pause' : 'Activate'}
-                </button>
-              </form>
-              <form action={handleDelete}>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-red-100 text-red-800 rounded-lg hover:bg-red-200 text-sm font-medium"
-                  onClick={(e) => {
-                    if (!confirm('Are you sure you want to delete this monitor?')) {
-                      e.preventDefault()
-                    }
-                  }}
-                >
-                  Delete
-                </button>
-              </form>
-            </div>
-          </div>
+      {/* Monitor Info */}
+      <IOSCard title="CONFIGURATION" className="mb-4">
+        <IOSRow label="URL" value={monitor.url.substring(0, 30) + '...'} />
+        <div className="h-px bg-ios-separator mx-4" />
+        <IOSRow label="Selector" value={monitor.selector} />
+        <div className="h-px bg-ios-separator mx-4" />
+        <IOSRow 
+          label="Check Interval" 
+          value={
+            monitor.interval_minutes === 60 ? 'Hourly' :
+            monitor.interval_minutes === 240 ? 'Every 4h' : 'Daily'
+          } 
+        />
+        <div className="h-px bg-ios-separator mx-4" />
+        <IOSRow label="Email" value={monitor.notification_email} />
+      </IOSCard>
 
-          <div className="grid md:grid-cols-2 gap-6">
-            <div>
-              <h3 className="text-sm font-medium text-gray-500 mb-2">Configuration</h3>
-              <dl className="space-y-2">
-                <div>
-                  <dt className="text-sm text-gray-600">Selector:</dt>
-                  <dd className="text-sm font-mono bg-gray-50 p-2 rounded">{monitor.selector}</dd>
-                </div>
-                <div>
-                  <dt className="text-sm text-gray-600">Value Type:</dt>
-                  <dd className="text-sm capitalize">{monitor.value_type}</dd>
-                </div>
-                <div>
-                  <dt className="text-sm text-gray-600">Check Interval:</dt>
-                  <dd className="text-sm">
-                    {monitor.interval_minutes === 60 && 'Every hour'}
-                    {monitor.interval_minutes === 240 && 'Every 4 hours'}
-                    {monitor.interval_minutes === 1440 && 'Daily'}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-sm text-gray-600">Notification Email:</dt>
-                  <dd className="text-sm">{monitor.notification_email}</dd>
-                </div>
-              </dl>
+      {/* Current Status */}
+      <IOSCard title="CURRENT STATUS" className="mb-4">
+        <IOSRow 
+          label="Last Check" 
+          value={monitor.last_checked_at 
+            ? new Date(monitor.last_checked_at).toLocaleDateString() 
+            : 'Never'
+          } 
+        />
+        <div className="h-px bg-ios-separator mx-4" />
+        <IOSRow 
+          label="Last Value" 
+          value={monitor.last_value ? monitor.last_value.substring(0, 20) : 'None'} 
+        />
+        {monitor.last_error && (
+          <>
+            <div className="h-px bg-ios-separator mx-4" />
+            <div className="px-4 py-3">
+              <div className="text-sm text-ios-secondary mb-1">Last Error</div>
+              <div className="text-xs text-red-600">{monitor.last_error}</div>
             </div>
+          </>
+        )}
+      </IOSCard>
 
-            <div>
-              <h3 className="text-sm font-medium text-gray-500 mb-2">Status</h3>
-              <dl className="space-y-2">
-                <div>
-                  <dt className="text-sm text-gray-600">Last Check:</dt>
-                  <dd className="text-sm">
-                    {monitor.last_checked_at
-                      ? new Date(monitor.last_checked_at).toLocaleString()
-                      : 'Never'}
-                  </dd>
+      {/* Actions */}
+      <IOSCard className="mb-4">
+        <form action={handleToggleActive}>
+          <button type="submit" className="w-full">
+            <IOSRow 
+              label={monitor.is_active ? 'Pause Monitor' : 'Activate Monitor'} 
+              className={monitor.is_active ? 'text-yellow-600' : 'text-green-600'}
+            />
+          </button>
+        </form>
+        <div className="h-px bg-ios-separator mx-4" />
+        <form action={handleDelete}>
+          <button 
+            type="submit" 
+            className="w-full"
+            onClick={(e) => {
+              if (!confirm('Are you sure you want to delete this monitor?')) {
+                e.preventDefault()
+              }
+            }}
+          >
+            <IOSRow label="Delete Monitor" className="text-red-600" />
+          </button>
+        </form>
+      </IOSCard>
+
+      {/* Change History */}
+      {events && events.length > 0 && (
+        <IOSCard title="CHANGE HISTORY" className="mb-4">
+          {events.map((event, index) => (
+            <div key={event.id}>
+              {index > 0 && <div className="h-px bg-ios-separator mx-4" />}
+              <div className="px-4 py-3">
+                <div className="text-xs text-ios-secondary mb-2">
+                  {new Date(event.changed_at).toLocaleString()}
                 </div>
-                <div>
-                  <dt className="text-sm text-gray-600">Last Status:</dt>
-                  <dd className="text-sm">
-                    <span
-                      className={`px-2 py-1 rounded text-xs font-semibold ${
-                        monitor.last_status === 'ok'
-                          ? 'bg-green-100 text-green-800'
-                          : monitor.last_status === 'error'
-                          ? 'bg-red-100 text-red-800'
-                          : 'bg-gray-100 text-gray-800'
-                      }`}
-                    >
-                      {monitor.last_status}
-                    </span>
-                  </dd>
-                </div>
-                {monitor.last_error && (
+                <div className="grid grid-cols-2 gap-3 text-xs">
                   <div>
-                    <dt className="text-sm text-gray-600">Last Error:</dt>
-                    <dd className="text-sm text-red-600">{monitor.last_error}</dd>
+                    <div className="text-ios-secondary mb-1">Old</div>
+                    <div className="bg-red-50 p-2 rounded text-red-800 break-all">
+                      {event.old_value}
+                    </div>
                   </div>
-                )}
-                <div>
-                  <dt className="text-sm text-gray-600">Last Value:</dt>
-                  <dd className="text-sm font-mono bg-gray-50 p-2 rounded break-all">
-                    {monitor.last_value || 'No value yet'}
-                  </dd>
+                  <div>
+                    <div className="text-ios-secondary mb-1">New</div>
+                    <div className="bg-green-50 p-2 rounded text-green-800 break-all">
+                      {event.new_value}
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <dt className="text-sm text-gray-600">Last Hash:</dt>
-                  <dd className="text-sm font-mono text-xs text-gray-500">
-                    {monitor.last_hash || 'N/A'}
-                  </dd>
-                </div>
-              </dl>
+              </div>
             </div>
-          </div>
-        </div>
+          ))}
+        </IOSCard>
+      )}
 
-        {/* Change History */}
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Change History</h3>
-          
-          {!events || events.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              <p>No changes detected yet</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {events.map((event) => (
-                <div key={event.id} className="border border-gray-200 rounded-lg p-4">
-                  <div className="flex justify-between items-start mb-3">
-                    <span className="text-sm text-gray-600">
-                      {new Date(event.changed_at).toLocaleString()}
-                    </span>
-                  </div>
-                  
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <h4 className="text-xs font-medium text-gray-500 mb-1">Previous Value</h4>
-                      <p className="text-sm bg-red-50 p-2 rounded border border-red-100">
-                        {event.old_value}
-                      </p>
-                    </div>
-                    <div>
-                      <h4 className="text-xs font-medium text-gray-500 mb-1">New Value</h4>
-                      <p className="text-sm bg-green-50 p-2 rounded border border-green-100">
-                        {event.new_value}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </main>
-    </div>
+      {(!events || events.length === 0) && (
+        <IOSCard className="mb-4">
+          <div className="p-8 text-center">
+            <p className="text-ios-secondary text-sm">No changes detected yet</p>
+          </div>
+        </IOSCard>
+      )}
+    </IOSContainer>
   )
 }

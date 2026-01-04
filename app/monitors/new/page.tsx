@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { IOSContainer, IOSCard, IOSInput, PrimaryButton, SecondaryButton } from '@/components/ios'
 
 export default function NewMonitorPage() {
   const router = useRouter()
@@ -81,110 +82,86 @@ export default function NewMonitorPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm">
-        <div className="max-w-4xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
-          <div className="flex items-center">
-            <Link href="/dashboard" className="text-blue-600 hover:text-blue-700 mr-4">
-              ← Back
-            </Link>
-            <h1 className="text-2xl font-bold text-gray-900">Add New Monitor</h1>
-          </div>
-        </div>
-      </header>
+    <IOSContainer>
+      <div className="mb-4">
+        <Link href="/dashboard" className="text-ios-tint text-sm font-medium">
+          ← Back
+        </Link>
+        <h1 className="text-[28px] font-semibold text-ios-label mt-2">Create Monitor</h1>
+      </div>
 
-      <main className="max-w-4xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <form onSubmit={handleSubmit} className="space-y-6">
+      <IOSCard>
+        <div className="p-6">
+          <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded">
+              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-ios text-sm">
                 {error}
               </div>
             )}
 
-            <div>
-              <label htmlFor="url" className="block text-sm font-medium text-gray-700">
-                URL <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="url"
-                id="url"
-                required
-                maxLength={2048}
-                value={formData.url}
-                onChange={(e) => setFormData({ ...formData, url: e.target.value })}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                placeholder="https://example.com/product"
-              />
-            </div>
+            <IOSInput
+              label="URL"
+              type="url"
+              id="url"
+              required
+              maxLength={2048}
+              value={formData.url}
+              onChange={(e) => setFormData({ ...formData, url: e.target.value })}
+              placeholder="https://example.com/product"
+            />
 
-            <div>
-              <label htmlFor="label" className="block text-sm font-medium text-gray-700">
-                Label (optional)
-              </label>
-              <input
-                type="text"
-                id="label"
-                maxLength={100}
-                value={formData.label}
-                onChange={(e) => setFormData({ ...formData, label: e.target.value })}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                placeholder="My Product"
-              />
-            </div>
+            <IOSInput
+              label="Label (optional)"
+              type="text"
+              id="label"
+              maxLength={100}
+              value={formData.label}
+              onChange={(e) => setFormData({ ...formData, label: e.target.value })}
+              placeholder="My Product"
+            />
 
-            <div>
-              <label htmlFor="selector" className="block text-sm font-medium text-gray-700">
-                CSS Selector <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                id="selector"
-                required
-                maxLength={200}
-                value={formData.selector}
-                onChange={(e) => setFormData({ ...formData, selector: e.target.value })}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                placeholder=".price-value"
-              />
-              <p className="mt-1 text-sm text-gray-500">
-                Use browser DevTools to find the CSS selector for the element you want to monitor
-              </p>
-            </div>
+            <IOSInput
+              label="CSS Selector"
+              type="text"
+              id="selector"
+              required
+              maxLength={200}
+              value={formData.selector}
+              onChange={(e) => setFormData({ ...formData, selector: e.target.value })}
+              placeholder=".price-value"
+              helperText="Right-click → Inspect → Copy selector"
+            />
 
-            <div className="flex space-x-4">
-              <button
-                type="button"
-                onClick={handleTest}
-                disabled={!formData.url || !formData.selector || testing}
-                className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-              >
-                {testing ? 'Testing...' : 'Test Selector'}
-              </button>
-            </div>
+            <SecondaryButton
+              type="button"
+              onClick={handleTest}
+              disabled={!formData.url || !formData.selector || testing}
+            >
+              {testing ? 'Testing...' : 'Test Selector'}
+            </SecondaryButton>
 
             {testResult && (
-              <div className={`p-4 rounded ${testResult.success ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
+              <div className={`p-4 rounded-ios text-sm ${testResult.success ? 'bg-green-50 border border-green-200 text-green-800' : 'bg-red-50 border border-red-200 text-red-600'}`}>
                 {testResult.success ? (
                   <div>
-                    <p className="text-green-800 font-medium mb-2">✓ Selector found!</p>
-                    <p className="text-green-700">Extracted value: <span className="font-mono">{testResult.value}</span></p>
+                    <p className="font-medium mb-1">✓ Selector found!</p>
+                    <p className="text-xs">Value: <span className="font-mono">{testResult.value}</span></p>
                   </div>
                 ) : (
-                  <p className="text-red-800">✗ {testResult.error}</p>
+                  <p>✗ {testResult.error}</p>
                 )}
               </div>
             )}
 
             <div>
-              <label htmlFor="value_type" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="value_type" className="block text-sm font-medium text-ios-label mb-2">
                 Value Type
               </label>
               <select
                 id="value_type"
                 value={formData.value_type}
                 onChange={(e) => setFormData({ ...formData, value_type: e.target.value as 'text' | 'price' })}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-3 bg-white border border-ios-separator rounded-ios text-ios-label text-[15px] focus:outline-none focus:ring-2 focus:ring-ios-tint focus:border-transparent"
               >
                 <option value="text">Text</option>
                 <option value="price">Price</option>
@@ -192,14 +169,14 @@ export default function NewMonitorPage() {
             </div>
 
             <div>
-              <label htmlFor="interval_minutes" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="interval_minutes" className="block text-sm font-medium text-ios-label mb-2">
                 Check Interval <span className="text-red-500">*</span>
               </label>
               <select
                 id="interval_minutes"
                 value={formData.interval_minutes}
                 onChange={(e) => setFormData({ ...formData, interval_minutes: e.target.value })}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-3 bg-white border border-ios-separator rounded-ios text-ios-label text-[15px] focus:outline-none focus:ring-2 focus:ring-ios-tint focus:border-transparent"
               >
                 <option value="60">Every hour</option>
                 <option value="240">Every 4 hours</option>
@@ -207,52 +184,42 @@ export default function NewMonitorPage() {
               </select>
             </div>
 
-            <div>
-              <label htmlFor="notification_email" className="block text-sm font-medium text-gray-700">
-                Notification Email <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="email"
-                id="notification_email"
-                required
-                value={formData.notification_email}
-                onChange={(e) => setFormData({ ...formData, notification_email: e.target.value })}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                placeholder="you@example.com"
-              />
-            </div>
+            <IOSInput
+              label="Notification Email"
+              type="email"
+              id="notification_email"
+              required
+              value={formData.notification_email}
+              onChange={(e) => setFormData({ ...formData, notification_email: e.target.value })}
+              placeholder="you@example.com"
+            />
 
-            <div className="flex items-center">
+            <div className="flex items-center pt-2">
               <input
                 type="checkbox"
                 id="is_active"
                 checked={formData.is_active}
                 onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                className="h-5 w-5 text-ios-tint focus:ring-ios-tint border-gray-300 rounded"
               />
-              <label htmlFor="is_active" className="ml-2 block text-sm text-gray-900">
+              <label htmlFor="is_active" className="ml-3 text-sm text-ios-label">
                 Monitor is active
               </label>
             </div>
 
-            <div className="flex justify-end space-x-4">
-              <Link
-                href="/dashboard"
-                className="px-6 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-              >
-                Cancel
+            <div className="flex gap-3 pt-4">
+              <Link href="/dashboard" className="flex-1">
+                <SecondaryButton>Cancel</SecondaryButton>
               </Link>
-              <button
-                type="submit"
-                disabled={loading}
-                className="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
-              >
-                {loading ? 'Creating...' : 'Create Monitor'}
-              </button>
+              <div className="flex-1">
+                <PrimaryButton type="submit" disabled={loading}>
+                  {loading ? 'Creating...' : 'Create Monitor'}
+                </PrimaryButton>
+              </div>
             </div>
           </form>
         </div>
-      </main>
-    </div>
+      </IOSCard>
+    </IOSContainer>
   )
 }
