@@ -12,10 +12,21 @@ export default async function DashboardPage() {
     redirect('/login')
   }
 
+  // Ensure profile exists for the user (create if it doesn't exist)
   const { data: profile } = await supabase
     .from('profiles')
+    .upsert(
+      {
+        id: user.id,
+        email: user.email || '',
+        plan: 'free',
+      },
+      {
+        onConflict: 'id',
+        ignoreDuplicates: true,
+      }
+    )
     .select('*')
-    .eq('id', user.id)
     .single()
 
   const { data: monitors } = await supabase
