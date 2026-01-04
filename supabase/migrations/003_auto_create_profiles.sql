@@ -7,7 +7,8 @@ BEGIN
     NEW.id,
     NEW.email,
     'free'
-  );
+  )
+  ON CONFLICT (id) DO NOTHING;
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
