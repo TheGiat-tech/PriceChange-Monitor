@@ -33,31 +33,46 @@ function PickerContent() {
 
   // Handle messages from iframe
   const handleMessage = useCallback((event: MessageEvent) => {
-    // Only accept messages from our iframe
-    if (event.source !== iframeRef.current?.contentWindow) return
+    try {
+      // Only accept messages from our iframe
+      if (event.source !== iframeRef.current?.contentWindow) return
 
-    const { type, elementInfo, textContent } = event.data
+      // Validate event data exists
+      if (!event.data || typeof event.data !== 'object') return
 
-    switch (type) {
-      case 'picker-ready':
-        setState('ready')
-        break
-      
-      case 'picker-select':
-        if (elementInfo && textContent) {
-          const selector = buildSelector(elementInfo as ElementInfo)
-          const value = normalizeText(textContent)
-          
-          if (value) {
-            setSelectedElement({ selector, value })
-            setState('selected')
+      const { type, elementInfo, textContent } = event.data
+
+      switch (type) {
+        case 'picker-ready':
+          setState('ready')
+          break
+        
+        case 'picker-select':
+          if (elementInfo && textContent) {
+            try {
+              const selector = buildSelector(elementInfo as ElementInfo)
+              const value = normalizeText(textContent)
+              
+              if (value) {
+                setSelectedElement({ selector, value })
+                setState('selected')
+              }
+            } catch (selectorError) {
+              console.error('Error building selector:', selectorError)
+              setState('error')
+              setError('Failed to process selected element')
+            }
           }
-        }
-        break
-      
-      case 'picker-cancel':
-        handleCancel()
-        break
+          break
+        
+        case 'picker-cancel':
+          handleCancel()
+          break
+      }
+    } catch (error) {
+      console.error('Error handling picker message:', error)
+      // Don't set error state for message handling errors
+      // as they might be benign
     }
   }, [handleCancel])
 
@@ -92,11 +107,32 @@ function PickerContent() {
   const handleRetry = () => {
     setState('loading')
     setError(null)
+    setSelectedElement(null)
     // Force iframe reload
     if (iframeRef.current) {
       iframeRef.current.src = iframeRef.current.src
     }
   }
+
+  // Pre-check if URL is fetchable before loading iframe
+  useEffect(() => {
+    if (!url) {
+      setState('error')
+      setError('No URL provided')
+      return
+    }
+
+    // Validate URL format
+    try {
+      new URL(url)
+    } catch {
+      setState('error')
+      setError('Invalid URL format')
+      return
+    }
+
+    setState('loading')
+  }, [url])
 
   // Construct iframe URL
   const iframeSrc = `/api/picker/render?url=${encodeURIComponent(url)}`
@@ -190,10 +226,15 @@ function PickerContent() {
             // If still loading after iframe loads, give it a moment for the script to initialize
             if (state === 'loading') {
               setTimeout(() => {
-                if (state === 'loading') {
-                  setState('error')
-                  setError("This page can't be previewed")
-                }
+                // Check state again before updating
+                setState((currentState) => {
+                  if (currentState === 'loading') {
+                    return 'error'
+                  }
+                  return currentState
+                })
+                // Set error message separately to avoid state update conflicts
+                setError("This page can't be previewed")
               }, PICKER_INITIALIZATION_TIMEOUT)
             }
           }}

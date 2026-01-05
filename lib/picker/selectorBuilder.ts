@@ -100,76 +100,151 @@ export interface ElementInfo {
 
 /**
  * Build a selector from element info, preferring stable selectors.
+ * Returns a fallback selector if element info is invalid.
  */
 export function buildSelector(element: ElementInfo): string {
-  // 1. Check for stable data-* attributes
-  for (const attr of DATA_ATTRIBUTES) {
-    const value = element.attributes[attr]
-    if (value) {
-      return `[${attr}="${escapeSelector(value)}"]`
+  try {
+    // Validate element info
+    if (!element || typeof element !== 'object') {
+      return 'body' // Fallback selector
     }
-  }
 
-  // 2. Check for a stable ID
-  if (element.id && !isRandomId(element.id)) {
-    return `#${escapeSelector(element.id)}`
-  }
-
-  // 3. Try to build with stable classes
-  const stableClasses = element.classList.filter(isStableClass)
-  if (stableClasses.length > 0) {
-    const classSelector = stableClasses.slice(0, 2).map(c => `.${escapeSelector(c)}`).join('')
-    const baseSelector = element.tagName.toLowerCase() + classSelector
-
-    // If we have a unique-looking selector, return it
-    if (stableClasses.length >= 1) {
-      return baseSelector
+    if (!element.tagName || typeof element.tagName !== 'string') {
+      return 'body' // Fallback selector
     }
-  }
 
-  // 4. Build a path-based selector using parent elements
-  const pathParts: string[] = []
-  
-  // Include up to 3 parents for context
-  const ancestors = [...element.parentPath].slice(-3)
-  
-  for (const ancestor of ancestors) {
-    const part = buildSimpleSelector(ancestor)
-    if (part) {
-      pathParts.push(part)
+    // Ensure arrays are initialized
+    const classList = Array.isArray(element.classList) ? element.classList : []
+    const attributes = element.attributes && typeof element.attributes === 'object' ? element.attributes : {}
+    const parentPath = Array.isArray(element.parentPath) ? element.parentPath : []
+
+    // 1. Check for stable data-* attributes
+    for (const attr of DATA_ATTRIBUTES) {
+      const value = attributes[attr]
+      if (value && typeof value === 'string') {
+        try {
+          return `[${attr}="${escapeSelector(value)}"]`
+        } catch {
+          // Continue to next option if escaping fails
+        }
+      }
     }
+
+    // 2. Check for a stable ID
+    if (element.id && typeof element.id === 'string' && !isRandomId(element.id)) {
+      try {
+        return `#${escapeSelector(element.id)}`
+      } catch {
+        // Continue to next option
+      }
+    }
+
+    // 3. Try to build with stable classes
+    const stableClasses = classList.filter(isStableClass)
+    if (stableClasses.length > 0) {
+      try {
+        const classSelector = stableClasses.slice(0, 2).map(c => `.${escapeSelector(c)}`).join('')
+        const baseSelector = element.tagName.toLowerCase() + classSelector
+
+        // If we have a unique-looking selector, return it
+        if (stableClasses.length >= 1) {
+          return baseSelector
+        }
+      } catch {
+        // Continue to next option
+      }
+    }
+
+    // 4. Build a path-based selector using parent elements
+    const pathParts: string[] = []
+    
+    // Include up to 3 parents for context
+    const ancestors = [...parentPath].slice(-3)
+    
+    for (const ancestor of ancestors) {
+      try {
+        const part = buildSimpleSelector(ancestor)
+        if (part) {
+          pathParts.push(part)
+        }
+      } catch {
+        // Skip this ancestor if there's an error
+      }
+    }
+
+    // Add the target element
+    try {
+      const nthOfType = typeof element.nthOfType === 'number' && element.nthOfType > 0 ? element.nthOfType : null
+      const simpleSelector = buildSimpleSelector(element)
+      
+      if (simpleSelector) {
+        pathParts.push(simpleSelector)
+      } else if (nthOfType) {
+        pathParts.push(`${element.tagName.toLowerCase()}:nth-of-type(${nthOfType})`)
+      } else {
+        // If no valid nth-of-type, just use the tag name
+        pathParts.push(element.tagName.toLowerCase())
+      }
+    } catch {
+      // Fallback to just the tag name
+      pathParts.push(element.tagName.toLowerCase())
+    }
+
+    return pathParts.length > 0 ? pathParts.join(' > ') : 'body'
+  } catch (error) {
+    // Ultimate fallback
+    console.error('Error building selector:', error)
+    return 'body'
   }
-
-  // Add the target element
-  const targetPart = buildSimpleSelector(element) || 
-    `${element.tagName.toLowerCase()}:nth-of-type(${element.nthOfType})`
-  pathParts.push(targetPart)
-
-  return pathParts.join(' > ')
 }
 
 function buildSimpleSelector(element: ElementInfo): string | null {
-  // Check for data attributes
-  for (const attr of DATA_ATTRIBUTES) {
-    const value = element.attributes[attr]
-    if (value) {
-      return `[${attr}="${escapeSelector(value)}"]`
+  try {
+    // Validate element
+    if (!element || typeof element !== 'object' || !element.tagName) {
+      return null
     }
-  }
 
-  // Check for stable ID
-  if (element.id && !isRandomId(element.id)) {
-    return `#${escapeSelector(element.id)}`
-  }
+    const attributes = element.attributes && typeof element.attributes === 'object' ? element.attributes : {}
+    const classList = Array.isArray(element.classList) ? element.classList : []
 
-  // Check for stable classes
-  const stableClasses = element.classList.filter(isStableClass)
-  if (stableClasses.length > 0) {
-    return element.tagName.toLowerCase() + 
-      stableClasses.slice(0, 2).map(c => `.${escapeSelector(c)}`).join('')
-  }
+    // Check for data attributes
+    for (const attr of DATA_ATTRIBUTES) {
+      const value = attributes[attr]
+      if (value && typeof value === 'string') {
+        try {
+          return `[${attr}="${escapeSelector(value)}"]`
+        } catch {
+          // Continue to next option
+        }
+      }
+    }
 
-  return null
+    // Check for stable ID
+    if (element.id && typeof element.id === 'string' && !isRandomId(element.id)) {
+      try {
+        return `#${escapeSelector(element.id)}`
+      } catch {
+        // Continue to next option
+      }
+    }
+
+    // Check for stable classes
+    const stableClasses = classList.filter(isStableClass)
+    if (stableClasses.length > 0) {
+      try {
+        return element.tagName.toLowerCase() + 
+          stableClasses.slice(0, 2).map(c => `.${escapeSelector(c)}`).join('')
+      } catch {
+        // Continue to next option
+      }
+    }
+
+    return null
+  } catch (error) {
+    console.error('Error in buildSimpleSelector:', error)
+    return null
+  }
 }
 
 /**

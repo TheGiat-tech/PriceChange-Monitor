@@ -68,56 +68,82 @@ function getPickerScript(): string {
 }
 
 export async function GET(request: NextRequest) {
-  const url = request.nextUrl.searchParams.get('url')
-
-  if (!url) {
-    return NextResponse.json(
-      { success: false, error: 'URL parameter is required' },
-      { status: 400 }
-    )
-  }
-
-  // Validate URL format
-  let parsedUrl: URL
-  try {
-    parsedUrl = new URL(url)
-  } catch {
-    return NextResponse.json(
-      { success: false, error: 'Invalid URL' },
-      { status: 400 }
-    )
-  }
-
-  // SSRF protection
-  if (isBlockedUrl(url)) {
-    return NextResponse.json(
-      { success: false, error: 'This URL cannot be accessed' },
-      { status: 400 }
-    )
-  }
-
-  // Only allow http/https
-  if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
-    return NextResponse.json(
-      { success: false, error: 'Only HTTP/HTTPS URLs are supported' },
-      { status: 400 }
-    )
-  }
-
   const controller = new AbortController()
-  const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS)
+  let timeout: NodeJS.Timeout | null = null
 
   try {
-    const response = await fetch(url, {
-      signal: controller.signal,
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; PricePingBot/1.0; +https://priceping.app)',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        'Accept-Language': 'en-US,en;q=0.5',
-      },
-    })
+    const url = request.nextUrl.searchParams.get('url')
 
-    clearTimeout(timeout)
+    if (!url) {
+      return NextResponse.json(
+        { success: false, error: 'URL parameter is required' },
+        { status: 400 }
+      )
+    }
+
+    // Validate URL format
+    let parsedUrl: URL
+    try {
+      parsedUrl = new URL(url)
+    } catch {
+      return NextResponse.json(
+        { success: false, error: 'Invalid URL' },
+        { status: 400 }
+      )
+    }
+
+    // SSRF protection
+    if (isBlockedUrl(url)) {
+      return NextResponse.json(
+        { success: false, error: 'This URL cannot be accessed' },
+        { status: 400 }
+      )
+    }
+
+    // Only allow http/https
+    if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
+      return NextResponse.json(
+        { success: false, error: 'Only HTTP/HTTPS URLs are supported' },
+        { status: 400 }
+      )
+    }
+
+    timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS)
+
+    let response: Response
+    try {
+      response = await fetch(url, {
+        signal: controller.signal,
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (compatible; PricePingBot/1.0; +https://priceping.app)',
+          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+          'Accept-Language': 'en-US,en;q=0.5',
+        },
+      })
+    } catch (fetchError) {
+      if (timeout) clearTimeout(timeout)
+      
+      if (fetchError instanceof Error) {
+        if (fetchError.name === 'AbortError') {
+          return NextResponse.json(
+            { success: false, error: 'Page took too long to load' },
+            { status: 504 }
+          )
+        }
+        // Network errors, DNS failures, etc.
+        return NextResponse.json(
+          { success: false, error: 'Unable to fetch page: Network error' },
+          { status: 502 }
+        )
+      }
+      
+      return NextResponse.json(
+        { success: false, error: 'Failed to fetch page' },
+        { status: 502 }
+      )
+    }
+
+    if (timeout) clearTimeout(timeout)
 
     if (!response.ok) {
       return NextResponse.json(
@@ -144,7 +170,15 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    const rawHtml = await response.text()
+    let rawHtml: string
+    try {
+      rawHtml = await response.text()
+    } catch (textError) {
+      return NextResponse.json(
+        { success: false, error: 'Failed to read page content' },
+        { status: 502 }
+      )
+    }
 
     // Additional size check after receiving content
     if (rawHtml.length > MAX_HTML_SIZE) {
@@ -156,7 +190,15 @@ export async function GET(request: NextRequest) {
 
     // Sanitize the HTML
     const baseUrl = parsedUrl.protocol + '//' + parsedUrl.host
-    const result = sanitizeHtml(rawHtml, { baseUrl })
+    let result
+    try {
+      result = sanitizeHtml(rawHtml, { baseUrl })
+    } catch (sanitizeError) {
+      return NextResponse.json(
+        { success: false, error: 'Failed to process page HTML' },
+        { status: 500 }
+      )
+    }
 
     if (!result.success || !result.html) {
       return NextResponse.json(
@@ -166,14 +208,29 @@ export async function GET(request: NextRequest) {
     }
 
     // Inject the picker script into the HTML
-    const pickerScript = getPickerScript()
+    let pickerScript: string
+    try {
+      pickerScript = getPickerScript()
+    } catch (scriptError) {
+      return NextResponse.json(
+        { success: false, error: 'Failed to generate picker script' },
+        { status: 500 }
+      )
+    }
 
     // Inject script before </body>
     let finalHtml = result.html
-    if (finalHtml.includes('</body>')) {
-      finalHtml = finalHtml.replace('</body>', pickerScript + '</body>')
-    } else {
-      finalHtml = finalHtml + pickerScript
+    try {
+      if (finalHtml.includes('</body>')) {
+        finalHtml = finalHtml.replace('</body>', pickerScript + '</body>')
+      } else {
+        finalHtml = finalHtml + pickerScript
+      }
+    } catch (injectionError) {
+      return NextResponse.json(
+        { success: false, error: 'Failed to inject picker script' },
+        { status: 500 }
+      )
     }
 
     // Return as HTML with security headers
@@ -194,20 +251,15 @@ export async function GET(request: NextRequest) {
       },
     })
   } catch (error) {
-    clearTimeout(timeout)
-
-    if (error instanceof Error) {
-      if (error.name === 'AbortError') {
-        return NextResponse.json(
-          { success: false, error: 'Page took too long to load' },
-          { status: 400 }
-        )
-      }
-    }
-
+    // Catch-all for any unexpected errors
+    if (timeout) clearTimeout(timeout)
+    
+    // Log error for debugging (in production, this would go to monitoring)
+    console.error('Picker render error:', error)
+    
     return NextResponse.json(
-      { success: false, error: 'Failed to fetch page' },
-      { status: 400 }
+      { success: false, error: 'An unexpected error occurred while processing the page' },
+      { status: 500 }
     )
   }
 }
