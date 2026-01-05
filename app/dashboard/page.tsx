@@ -40,7 +40,19 @@ export default async function DashboardPage() {
     .single()
 
   // Fallback to free plan if profile doesn't exist or error occurs
-  const userProfile = profile || { id: user.id, email: user.email || '', plan: 'free' as const }
+  const userProfile = profile || { 
+    id: user.id, 
+    email: user.email || '', 
+    plan: 'free' as const,
+    stripe_customer_id: null,
+    stripe_subscription_id: null,
+    subscription_status: null,
+    plan_expires_at: null,
+    paypal_subscription_id: null,
+    paypal_status: null,
+    billing_provider: null,
+    created_at: new Date().toISOString()
+  }
 
   if (profileError) {
     console.error('Error fetching profile:', profileError)
