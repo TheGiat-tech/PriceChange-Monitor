@@ -62,6 +62,8 @@ export default async function MonitorDetailPage({
     const supabase = await createClient()
     const { id } = await params
     
+    let shouldRedirect = false
+    
     try {
       const { data: currentMonitor, error: fetchError } = await supabase
         .from('monitors')
@@ -71,19 +73,25 @@ export default async function MonitorDetailPage({
 
       if (fetchError || !currentMonitor) {
         console.error('Error fetching monitor for toggle:', fetchError)
-        redirect('/dashboard')
-      }
-
-      const { error: updateError } = await supabase
-        .from('monitors')
-        .update({ is_active: !currentMonitor.is_active })
-        .eq('id', id)
-      
-      if (updateError) {
-        console.error('Error updating monitor:', updateError)
+        shouldRedirect = true
+      } else {
+        const { error: updateError } = await supabase
+          .from('monitors')
+          .update({ is_active: !currentMonitor.is_active })
+          .eq('id', id)
+        
+        if (updateError) {
+          console.error('Error updating monitor:', updateError)
+          shouldRedirect = true
+        }
       }
     } catch (err) {
       console.error('Exception toggling monitor:', err)
+      shouldRedirect = true
+    }
+    
+    if (shouldRedirect) {
+      redirect('/dashboard')
     }
     
     redirect(`/monitors/${id}`)

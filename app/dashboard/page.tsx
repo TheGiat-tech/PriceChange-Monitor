@@ -39,7 +39,8 @@ export default async function DashboardPage() {
     .eq('id', user.id)
     .single()
 
-  // Fallback to free plan if profile doesn't exist or error occurs
+  // Fallback to a default free plan profile if fetch fails
+  // This ensures the page can still render even with database errors
   const userProfile = profile || { 
     id: user.id, 
     email: user.email || '', 
