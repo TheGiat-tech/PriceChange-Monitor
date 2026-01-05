@@ -8,6 +8,7 @@ export async function GET(request: Request) {
   if (code) {
     const supabase = await createClient()
     try {
+      // Handle both API errors (returned in error object) and thrown exceptions (network/timeout errors)
       const { error } = await supabase.auth.exchangeCodeForSession(code)
       if (error) {
         console.error('Error exchanging code for session:', error)
