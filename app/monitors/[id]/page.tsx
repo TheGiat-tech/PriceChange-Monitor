@@ -17,29 +17,43 @@ export default async function MonitorDetailPage({
     redirect('/login')
   }
 
-  const { data: monitor } = await supabase
+  const { data: monitor, error: monitorError } = await supabase
     .from('monitors')
     .select('*')
     .eq('id', id)
     .eq('user_id', user.id)
     .single()
 
-  if (!monitor) {
+  if (monitorError || !monitor) {
+    console.error('Error fetching monitor:', monitorError)
     redirect('/dashboard')
   }
 
-  const { data: events } = await supabase
+  const { data: events, error: eventsError } = await supabase
     .from('events')
     .select('*')
     .eq('monitor_id', id)
     .order('changed_at', { ascending: false })
     .limit(20)
 
+  if (eventsError) {
+    console.error('Error fetching events:', eventsError)
+  }
+
   const handleDelete = async () => {
     'use server'
     const supabase = await createClient()
     const { id } = await params
-    await supabase.from('monitors').delete().eq('id', id)
+    
+    try {
+      const { error } = await supabase.from('monitors').delete().eq('id', id)
+      if (error) {
+        console.error('Error deleting monitor:', error)
+      }
+    } catch (err) {
+      console.error('Exception deleting monitor:', err)
+    }
+    
     redirect('/dashboard')
   }
 
@@ -48,16 +62,30 @@ export default async function MonitorDetailPage({
     const supabase = await createClient()
     const { id } = await params
     
-    const { data: currentMonitor } = await supabase
-      .from('monitors')
-      .select('is_active')
-      .eq('id', id)
-      .single()
+    try {
+      const { data: currentMonitor, error: fetchError } = await supabase
+        .from('monitors')
+        .select('is_active')
+        .eq('id', id)
+        .single()
 
-    await supabase
-      .from('monitors')
-      .update({ is_active: !currentMonitor?.is_active })
-      .eq('id', id)
+      if (fetchError || !currentMonitor) {
+        console.error('Error fetching monitor for toggle:', fetchError)
+        redirect(`/monitors/${id}`)
+        return
+      }
+
+      const { error: updateError } = await supabase
+        .from('monitors')
+        .update({ is_active: !currentMonitor.is_active })
+        .eq('id', id)
+      
+      if (updateError) {
+        console.error('Error updating monitor:', updateError)
+      }
+    } catch (err) {
+      console.error('Exception toggling monitor:', err)
+    }
     
     redirect(`/monitors/${id}`)
   }

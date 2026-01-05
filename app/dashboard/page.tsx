@@ -14,7 +14,7 @@ export default async function DashboardPage() {
 
   // Ensure profile exists for the user (create if it doesn't exist)
   // First, try to upsert (will create if doesn't exist, ignore if exists)
-  await supabase
+  const { error: upsertError } = await supabase
     .from('profiles')
     .upsert(
       {
@@ -28,21 +28,36 @@ export default async function DashboardPage() {
       }
     )
   
-  // Then fetch the profile (this will always return the profile)
-  const { data: profile } = await supabase
+  if (upsertError) {
+    console.error('Error upserting profile:', upsertError)
+  }
+  
+  // Then fetch the profile
+  const { data: profile, error: profileError } = await supabase
     .from('profiles')
     .select('*')
     .eq('id', user.id)
     .single()
 
-  const { data: monitors } = await supabase
+  // Fallback to free plan if profile doesn't exist or error occurs
+  const userProfile = profile || { id: user.id, email: user.email || '', plan: 'free' }
+
+  if (profileError) {
+    console.error('Error fetching profile:', profileError)
+  }
+
+  const { data: monitors, error: monitorsError } = await supabase
     .from('monitors')
     .select('*')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
 
+  if (monitorsError) {
+    console.error('Error fetching monitors:', monitorsError)
+  }
+
   const activeMonitorsCount = monitors?.filter(m => m.is_active).length || 0
-  const maxMonitors = profile?.plan === 'pro' ? 20 : 1
+  const maxMonitors = userProfile.plan === 'pro' ? 20 : 1
 
   // Get user initials for avatar
   const userInitials = user.email?.substring(0, 2).toUpperCase() || 'U'
@@ -65,7 +80,7 @@ export default async function DashboardPage() {
               href="/pricing"
               className="text-ios-tint text-[15px]"
             >
-              {profile?.plan === 'pro' ? 'Pro' : 'Upgrade'}
+              {userProfile.plan === 'pro' ? 'Pro' : 'Upgrade'}
             </Link>
             <div className="w-8 h-8 rounded-full bg-ios-separator/40 text-ios-label flex items-center justify-center text-[13px] font-medium">
               {userInitials}
@@ -127,7 +142,7 @@ export default async function DashboardPage() {
               <div className="h-px bg-ios-separator" />
               <div className="px-4 py-3">
                 <p className="text-[13px] text-ios-secondary text-center">
-                  Monitor limit reached. {profile?.plan === 'free' && (
+                  Monitor limit reached. {userProfile.plan === 'free' && (
                     <Link href="/pricing" className="text-ios-tint">Upgrade</Link>
                   )}
                 </p>
