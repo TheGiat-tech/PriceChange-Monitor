@@ -15,4 +15,4 @@ jobs:
           curl -X POST "${{ secrets.APP_URL }}/api/cron/check" \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             -H "Content-Type: application/json" \
-            -v
+            -w "\nHTTP Status: %{http_code}\n" || true
