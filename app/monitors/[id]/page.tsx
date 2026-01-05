@@ -11,35 +11,78 @@ export default async function MonitorDetailPage({
   const { id } = await params
   const supabase = await createClient()
   
-  const { data: { user } } = await supabase.auth.getUser()
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
   
-  if (!user) {
+  if (authError || !user) {
+    console.error('[Monitor Detail] Auth error:', authError?.message || 'No user')
     redirect('/login')
   }
 
-  const { data: monitor } = await supabase
+  const { data: monitor, error: monitorError } = await supabase
     .from('monitors')
     .select('*')
     .eq('id', id)
     .eq('user_id', user.id)
     .single()
 
+  if (monitorError) {
+    console.error('[Monitor Detail] Monitor fetch error:', {
+      userId: user.id,
+      monitorId: id,
+      error: monitorError.message,
+      code: monitorError.code,
+    })
+    redirect('/dashboard')
+  }
+
   if (!monitor) {
     redirect('/dashboard')
   }
 
-  const { data: events } = await supabase
+  const { data: events, error: eventsError } = await supabase
     .from('events')
     .select('*')
     .eq('monitor_id', id)
     .order('changed_at', { ascending: false })
     .limit(20)
 
+  if (eventsError) {
+    console.error('[Monitor Detail] Events fetch error:', {
+      userId: user.id,
+      monitorId: id,
+      error: eventsError.message,
+      code: eventsError.code,
+    })
+    // Continue without events rather than failing completely
+  }
+
   const handleDelete = async () => {
     'use server'
     const supabase = await createClient()
     const { id } = await params
-    await supabase.from('monitors').delete().eq('id', id)
+    
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    
+    if (authError || !user) {
+      console.error('[Monitor Delete Action] Auth error:', authError?.message || 'No user')
+      redirect('/login')
+    }
+    
+    const { error } = await supabase
+      .from('monitors')
+      .delete()
+      .eq('id', id)
+      .eq('user_id', user.id)
+    
+    if (error) {
+      console.error('[Monitor Delete Action] Delete error:', {
+        userId: user.id,
+        monitorId: id,
+        error: error.message,
+        code: error.code,
+      })
+    }
+    
     redirect('/dashboard')
   }
 
@@ -48,16 +91,45 @@ export default async function MonitorDetailPage({
     const supabase = await createClient()
     const { id } = await params
     
-    const { data: currentMonitor } = await supabase
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    
+    if (authError || !user) {
+      console.error('[Monitor Toggle Action] Auth error:', authError?.message || 'No user')
+      redirect('/login')
+    }
+    
+    const { data: currentMonitor, error: fetchError } = await supabase
       .from('monitors')
       .select('is_active')
       .eq('id', id)
+      .eq('user_id', user.id)
       .single()
 
-    await supabase
+    if (fetchError) {
+      console.error('[Monitor Toggle Action] Fetch error:', {
+        userId: user.id,
+        monitorId: id,
+        error: fetchError.message,
+        code: fetchError.code,
+      })
+      redirect(`/monitors/${id}`)
+      return
+    }
+
+    const { error: updateError } = await supabase
       .from('monitors')
       .update({ is_active: !currentMonitor?.is_active })
       .eq('id', id)
+      .eq('user_id', user.id)
+    
+    if (updateError) {
+      console.error('[Monitor Toggle Action] Update error:', {
+        userId: user.id,
+        monitorId: id,
+        error: updateError.message,
+        code: updateError.code,
+      })
+    }
     
     redirect(`/monitors/${id}`)
   }

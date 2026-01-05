@@ -6,15 +6,16 @@ import { IOSContainer, IOSCard, IOSRow, IOSBadge, TintButton, PrimaryButton } fr
 export default async function DashboardPage() {
   const supabase = await createClient()
   
-  const { data: { user } } = await supabase.auth.getUser()
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
   
-  if (!user) {
+  if (authError || !user) {
+    console.error('[Dashboard] Auth error:', authError?.message || 'No user')
     redirect('/login')
   }
 
   // Ensure profile exists for the user (create if it doesn't exist)
   // First, try to upsert (will create if doesn't exist, ignore if exists)
-  await supabase
+  const { error: upsertError } = await supabase
     .from('profiles')
     .upsert(
       {
@@ -28,18 +29,44 @@ export default async function DashboardPage() {
       }
     )
   
+  if (upsertError) {
+    console.error('[Dashboard] Profile upsert error:', {
+      userId: user.id,
+      error: upsertError.message,
+      code: upsertError.code,
+    })
+  }
+  
   // Then fetch the profile (this will always return the profile)
-  const { data: profile } = await supabase
+  const { data: profile, error: profileError } = await supabase
     .from('profiles')
     .select('*')
     .eq('id', user.id)
     .single()
 
-  const { data: monitors } = await supabase
+  if (profileError) {
+    console.error('[Dashboard] Profile fetch error:', {
+      userId: user.id,
+      error: profileError.message,
+      code: profileError.code,
+    })
+    // Redirect to login if profile cannot be fetched
+    redirect('/login')
+  }
+
+  const { data: monitors, error: monitorsError } = await supabase
     .from('monitors')
     .select('*')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
+
+  if (monitorsError) {
+    console.error('[Dashboard] Monitors fetch error:', {
+      userId: user.id,
+      error: monitorsError.message,
+      code: monitorsError.code,
+    })
+  }
 
   const activeMonitorsCount = monitors?.filter(m => m.is_active).length || 0
   const maxMonitors = profile?.plan === 'pro' ? 20 : 1
