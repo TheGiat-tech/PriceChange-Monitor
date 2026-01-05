@@ -103,7 +103,7 @@ export async function PATCH(
 
       if (countError) {
         console.error('Error counting monitors:', countError)
-        return NextResponse.json({ error: 'Error checking monitor limits' }, { status: 500 })
+        return NextResponse.json({ error: 'Unable to verify monitor count for plan limits' }, { status: 500 })
       }
 
       if (!canCreateMonitor(plan, count || 0)) {

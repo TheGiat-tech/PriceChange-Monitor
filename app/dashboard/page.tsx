@@ -40,7 +40,7 @@ export default async function DashboardPage() {
     .single()
 
   // Fallback to free plan if profile doesn't exist or error occurs
-  const userProfile = profile || { id: user.id, email: user.email || '', plan: 'free' }
+  const userProfile = profile || { id: user.id, email: user.email || '', plan: 'free' as const }
 
   if (profileError) {
     console.error('Error fetching profile:', profileError)

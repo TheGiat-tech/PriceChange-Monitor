@@ -72,7 +72,6 @@ export default async function MonitorDetailPage({
       if (fetchError || !currentMonitor) {
         console.error('Error fetching monitor for toggle:', fetchError)
         redirect(`/monitors/${id}`)
-        return
       }
 
       const { error: updateError } = await supabase
