@@ -54,9 +54,17 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  let user = null
+  try {
+    const {
+      data: { user: authUser },
+    } = await supabase.auth.getUser()
+    user = authUser
+  } catch (error) {
+    console.error('Error getting user in middleware:', error)
+    // Treat as no user on error
+    user = null
+  }
 
   // Protected routes
   if (

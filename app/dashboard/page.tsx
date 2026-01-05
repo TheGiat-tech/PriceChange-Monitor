@@ -6,7 +6,14 @@ import { IOSContainer, IOSCard, IOSRow, IOSBadge, TintButton, PrimaryButton } fr
 export default async function DashboardPage() {
   const supabase = await createClient()
   
-  const { data: { user } } = await supabase.auth.getUser()
+  let user = null
+  try {
+    const { data: { user: authUser } } = await supabase.auth.getUser()
+    user = authUser
+  } catch (error) {
+    console.error('Error getting user in dashboard:', error)
+    redirect('/login')
+  }
   
   if (!user) {
     redirect('/login')
