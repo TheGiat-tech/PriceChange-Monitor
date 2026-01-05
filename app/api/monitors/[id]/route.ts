@@ -49,7 +49,7 @@ export async function PATCH(
 
     // Ensure profile exists for the user (create if it doesn't exist)
     // First, try to upsert (will create if doesn't exist, ignore if exists)
-    await supabase
+    const { error: upsertError } = await supabase
       .from('profiles')
       .upsert(
         {
@@ -63,34 +63,48 @@ export async function PATCH(
         }
       )
     
-    // Then fetch the profile (this will always return the profile)
-    const { data: profile } = await supabase
+    if (upsertError) {
+      console.error('Error upserting profile:', upsertError)
+    }
+    
+    // Then fetch the profile
+    const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('plan')
       .eq('id', user.id)
       .single()
 
+    if (profileError) {
+      console.error('Error fetching profile:', profileError)
+    }
+
     const plan = (profile?.plan || 'free') as Plan
 
     // Get existing monitor to check current state
-    const { data: existingMonitor } = await supabase
+    const { data: existingMonitor, error: monitorError } = await supabase
       .from('monitors')
       .select('is_active')
       .eq('id', id)
       .eq('user_id', user.id)
       .single()
 
-    if (!existingMonitor) {
+    if (monitorError || !existingMonitor) {
+      console.error('Error fetching existing monitor:', monitorError)
       return NextResponse.json({ error: 'Monitor not found' }, { status: 404 })
     }
 
     // If activating a monitor, check plan limits
     if (body.is_active === true && !existingMonitor.is_active) {
-      const { count } = await supabase
+      const { count, error: countError } = await supabase
         .from('monitors')
         .select('*', { count: 'exact', head: true })
         .eq('user_id', user.id)
         .eq('is_active', true)
+
+      if (countError) {
+        console.error('Error counting monitors:', countError)
+        return NextResponse.json({ error: 'Unable to verify monitor count for plan limits' }, { status: 500 })
+      }
 
       if (!canCreateMonitor(plan, count || 0)) {
         return NextResponse.json(
